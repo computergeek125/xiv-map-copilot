@@ -57,7 +57,7 @@ async function resetTabs() {
         e_button.setAttribute( "aria-selected", false);
         e_button.innerText = e_name;
         const e_content = document.createElement('div');
-        e_content.setAttribute(          "class", "tab-pane fade");
+        e_content.setAttribute(          "class", "tab-pane fade h-100");
         e_content.setAttribute(             "id", e_content_id);
         e_content.setAttribute(           "role", "tabpanel");
         e_content.setAttribute("aria-labelledby", e_button_id);
@@ -69,7 +69,7 @@ async function resetTabs() {
         e_tabstrip.setAttribute(         "role", "tablist");
         // tab content: <div class="tab-content" id="myTabContent">
         const e_tabcontent = document.createElement("div");
-        e_tabcontent.setAttribute(        "class", "tab-content");
+        e_tabcontent.setAttribute(        "class", "tab-content h-100");
         e_tabcontent.setAttribute(           "id", `expac-tabs-${e_id}-tabcontent`);
         e_tabcontent.setAttribute("data-bs-theme", "dark");
         for (let mx=0; mx<map_index['expansions'][e]["maps"].length; mx++) {
@@ -100,7 +100,7 @@ async function resetTabs() {
             map_tab_li.appendChild(map_tab_btn);
             // tab content: <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">...</div>
             const map_content = document.createElement("div");
-            map_content.setAttribute(          "class", "tab-pane fade");
+            map_content.setAttribute(          "class", "tab-pane fade h-100");
             map_content.setAttribute(             "id", map_content_id);
             map_content.setAttribute(           "role", "tabpanel");
             map_content.setAttribute("aria-labelledby", map_button_id);
@@ -112,8 +112,10 @@ async function resetTabs() {
             const map_img = document.createElement("img");
             //map_img.setAttribute("style", "height: 100%; width: 100%; object-fit: contain");
             //map_img.setAttribute("style", "height: 100%; width: 100%; object-fit: contain");
-            map_img.setAttribute("class", "img-fluid");
+            map_img.setAttribute("class", "img-fluid h-100");
             map_img.setAttribute("src", map_img_url);
+
+
 
             map_content.appendChild(map_img);
             e_tabstrip.appendChild(map_tab_li);
@@ -121,7 +123,7 @@ async function resetTabs() {
         }
         e_tabstrip.firstElementChild.firstElementChild.setAttribute("class", "nav-link active");
         e_tabstrip.firstElementChild.setAttribute("aria-selected", true);
-        e_tabcontent.firstElementChild.setAttribute(      "class", "tab-pane fade show active");
+        e_tabcontent.firstElementChild.setAttribute(      "class", "tab-pane fade h-100 show active");
         e_content.appendChild(e_tabstrip);
         e_content.appendChild(e_tabcontent);
         expac_tabs_buttons.appendChild(e_button);
@@ -129,7 +131,7 @@ async function resetTabs() {
     }
     expac_tabs_buttons.firstElementChild.setAttribute(        "class", "nav-link active");
     expac_tabs_buttons.firstElementChild.setAttribute("aria-selected", true);
-    expac_tabs_content.firstElementChild.setAttribute(        "class", "tab-pane fade show active");
+    expac_tabs_content.firstElementChild.setAttribute(        "class", "tab-pane fade h-100 show active");
 }
 
 let index_url;
