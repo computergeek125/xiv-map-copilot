@@ -8,71 +8,32 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./copilot.js"></script>
   </head>
-  <body class="p-2 m-0 border-0 bd-example d-flex justify-content-between" data-bs-theme="dark">
-    <div class="d-flex align-items-start">
-      <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-        <button class="nav-link active" id="v-pills-arr-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-arr" type="button" role="tab" aria-controls="v-pills-arr" aria-selected="true">ARR</button>
-        <button class="nav-link" id="v-pills-hw-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-hw" type="button" role="tab" aria-controls="v-pills-hw" aria-selected="false">Heavensward</button>
-        <button class="nav-link" id="v-pills-sb-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-sb" type="button" role="tab" aria-controls="v-pills-sb" aria-selected="false">Stormblood</button>
-        <button class="nav-link" id="v-pills-shb-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-shb" type="button" role="tab" aria-controls="v-pills-shb" aria-selected="false">Shadowbringers</button>
-        <button class="nav-link" id="v-pills-ew-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-ew" type="button" role="tab" aria-controls="v-pills-ew" aria-selected="false">Endwalker</button>
+  <body data-bs-theme="dark">
+    <div class="container-flex p-3 m-0">
+      <div id="index-loader" class="row p-0 align-items-start">
+        <div class="col p-2 input-group mb-12">
+          <div class="input-group-prepend">
+            <button class="btn btn-primary" data-bs-theme="dark" type="button" onclick="loadIndex()">Load index</button>
+          </div>
+          <input id="index-location" type="text" class="form-control" data-bs-theme="dark" placeholder="Index URL" aria-label="Index URL" aria-describedby="basic-addon2" />
+        </div>
       </div>
-      <div class="tab-content" id="v-pills-tabContent">
-        <div class="tab-pane fade show active" id="v-pills-arr" role="tabpanel" aria-labelledby="v-pills-arr-tab">A Realm Reborn Data</div>
-        <div class="tab-pane fade" id="v-pills-hw" role="tabpanel" aria-labelledby="v-pills-hw-tab">Heavensward Data</div>
-        <div class="tab-pane fade" id="v-pills-sb" role="tabpanel" aria-labelledby="v-pills-sb-tab">Stormblood Data</div>
-        <div class="tab-pane fade" id="v-pills-shb" role="tabpanel" aria-labelledby="v-pills-shb-tab">Shadowbringers Data</div>
-        <div class="tab-pane fade" id="v-pills-ew" role="tabpanel" aria-labelledby="v-pills-ew-tab">
-          <div>Endwalker Data</div>
+      <div id="main-area" class="row p-0 align-items-start">
+        <div id="expac-tabs-buttons" class="col-2 p-2 nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+          <button class="nav-link active" id="v-pills-arr-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-arr" type="button" role="tab" aria-controls="v-pills-arr" aria-selected="true">ARR</button>
+          <button class="nav-link" id="v-pills-hw-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-hw" type="button" role="tab" aria-controls="v-pills-hw" aria-selected="false">Heavensward</button>
+          <button class="nav-link" id="v-pills-sb-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-sb" type="button" role="tab" aria-controls="v-pills-sb" aria-selected="false">Stormblood</button>
+          <button class="nav-link" id="v-pills-shb-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-shb" type="button" role="tab" aria-controls="v-pills-shb" aria-selected="false">Shadowbringers</button>
+          <button class="nav-link" id="v-pills-ew-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-ew" type="button" role="tab" aria-controls="v-pills-ew" aria-selected="false">Endwalker</button>
+        </div>
+        <div id="expac-tabs-content" class="col p-2 tab-content">
+          <div class="tab-pane fade show active" id="v-pills-arr" role="tabpanel" aria-labelledby="v-pills-arr-tab">A Realm Reborn Placeholder Data</div>
+          <div class="tab-pane fade" id="v-pills-hw" role="tabpanel" aria-labelledby="v-pills-hw-tab">Heavensward Placeholder Data</div>
+          <div class="tab-pane fade" id="v-pills-sb" role="tabpanel" aria-labelledby="v-pills-sb-tab">Stormblood Placeholder Data</div>
+          <div class="tab-pane fade" id="v-pills-shb" role="tabpanel" aria-labelledby="v-pills-shb-tab">Shadowbringers Placeholder Data</div>
+          <div class="tab-pane fade" id="v-pills-ew" role="tabpanel" aria-labelledby="v-pills-ew-tab">Endwalker Placeholder Data</div>
         </div>
       </div>
     </div>
-
-    <!-- Example Code -->
-    
-    <div class="dropdown" data-bs-theme="light">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonLight" data-bs-toggle="dropdown" aria-expanded="false">
-        Default dropdown
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonLight" style="">
-        <li><a class="dropdown-item active" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Separated link</a></li>
-      </ul>
-    </div>
-    
-    <div class="dropdown" data-bs-theme="dark">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonDark" data-bs-toggle="dropdown" aria-expanded="false">
-        Dark dropdown
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonDark" style="">
-        <li><a class="dropdown-item active" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Separated link</a></li>
-      </ul>
-    </div>
-    <div class="container">
-      <h1>Bootstrap Dynamic Tabs</h1>
-      <div class="well">
-        
-        <a href="#" id="btnAdd"><i class="icon-plus-sign-alt"></i> Add Tab</a>
-        <br><br>
-        <ul class="nav nav-tabs" id="tabs">
-            <li class="active"><a href="#tab1">Tab 1</a></li>
-        </ul>
-        
-        <div class="tab-content">
-            <div class="tab-pane active" id="tab1">Hello tab #1 content...</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- End Example Code -->
   </body>
 </html>
