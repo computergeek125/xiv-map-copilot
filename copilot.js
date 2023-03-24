@@ -57,7 +57,7 @@ async function resetTabs() {
         e_button.setAttribute( "aria-selected", false);
         e_button.innerText = e_name;
         const e_content = document.createElement('div');
-        e_content.setAttribute(          "class", "tab-pane fade h-100");
+        e_content.setAttribute(          "class", "tab-pane fade h-100 w-100");
         e_content.setAttribute(             "id", e_content_id);
         e_content.setAttribute(           "role", "tabpanel");
         e_content.setAttribute("aria-labelledby", e_button_id);
@@ -70,7 +70,7 @@ async function resetTabs() {
         e_tabstrip.setAttribute(         "role", "tablist");
         // tab content: <div class="tab-content" id="myTabContent">
         const e_tabcontent = document.createElement("div");
-        e_tabcontent.setAttribute(        "class", "tab-content h-100");
+        e_tabcontent.setAttribute(        "class", "tab-content h-100 w-100");
         e_tabcontent.setAttribute(           "id", `expac-tabs-${e_id}-tabcontent`);
         e_tabcontent.setAttribute("data-bs-theme", "dark");
         e_tabcontent.setAttribute(        "style", "position: relative;");
@@ -102,7 +102,7 @@ async function resetTabs() {
             map_tab_li.appendChild(map_tab_btn);
             // tab content: <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">...</div>
             const map_content = document.createElement("div");
-            map_content.setAttribute(          "class", "tab-pane fade h-100");
+            map_content.setAttribute(          "class", "tab-pane fade h-100 w-100");
             map_content.setAttribute(             "id", map_content_id);
             map_content.setAttribute(           "role", "tabpanel");
             map_content.setAttribute("aria-labelledby", map_button_id);
@@ -116,7 +116,7 @@ async function resetTabs() {
             //console.log(`${map_img_relpath} | ${map_img_url}`);
             const map_img = document.createElement("img");
             map_img.setAttribute(   "id", map_img_id);
-            map_img.setAttribute("class", "img-fluid h-100");
+            map_img.setAttribute("class", "img-fluid mh-100 mw-100");
             map_img.setAttribute("style", "position: absolute;");
             map_img.setAttribute(  "src", map_img_url);
             const mi_w = map_img.naturalWidth;
@@ -125,7 +125,7 @@ async function resetTabs() {
             const map_svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             map_svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
             map_svg.setAttribute(   "id", map_svg_id);
-            map_svg.setAttribute("class", "img-fluid h-100");
+            map_svg.setAttribute("class", "img-fluid mh-100 mw-100");
             map_svg.setAttribute("style", "position: absolute");
             map_svg.setAttribute("viewBox", `0 0 1177 1177`)
             //map_svg.setAttribute("viewBox", `0 0 ${mi_w} ${mi_h}`)
@@ -147,7 +147,7 @@ async function resetTabs() {
         }
         e_tabstrip.firstElementChild.firstElementChild.setAttribute("class", "nav-link active");
         e_tabstrip.firstElementChild.setAttribute("aria-selected", true);
-        e_tabcontent.firstElementChild.setAttribute(      "class", "tab-pane fade h-100 show active");
+        e_tabcontent.firstElementChild.setAttribute(      "class", "tab-pane fade h-100 w-100 show active");
         e_content.appendChild(e_tabstrip);
         e_content.appendChild(e_tabcontent);
         expac_tabs_buttons.appendChild(e_button);
@@ -155,7 +155,7 @@ async function resetTabs() {
     }
     expac_tabs_buttons.firstElementChild.setAttribute(        "class", "nav-link active");
     expac_tabs_buttons.firstElementChild.setAttribute("aria-selected", true);
-    expac_tabs_content.firstElementChild.setAttribute(        "class", "tab-pane fade h-100 show active");
+    expac_tabs_content.firstElementChild.setAttribute(        "class", "tab-pane fade h-100 w-100 show active");
 }
 
 function gen_svg_cross(x, y, r, f="red", r_edge=0.1) {
