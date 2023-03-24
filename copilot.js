@@ -98,6 +98,7 @@ async function resetTabs() {
             map_tab_btn.setAttribute(          "role", "tab");
             map_tab_btn.setAttribute( "aria-controls", map_content_id);
             map_tab_btn.setAttribute( "aria-selected", false);
+            //map_tab_btn.addEventListener("click", click_test);
             map_tab_btn.innerText = map_name
             map_tab_li.appendChild(map_tab_btn);
             // tab content: <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">...</div>
@@ -109,8 +110,9 @@ async function resetTabs() {
             map_content.setAttribute(          "style", "position: relative;");
             map_content.setAttribute(       "tabindex", 0);
 
-            const map_svg_id = `map-${e_id}-${map_id}-canvas`;
             const map_img_id = `map-${e_id}-${map_id}-image`;
+            //const map_svg_id = `map-${e_id}-${map_id}-canvas`;
+            const map_svg_id = `map-${e_id}-${map_id}-image-overlay`;
             const map_img_relpath = `${e}/${m}/${map_info["filename"]}`;
             const map_img_url = new URL(map_img_relpath, img_url_base);
             //console.log(`${map_img_relpath} | ${map_img_url}`);
@@ -119,16 +121,14 @@ async function resetTabs() {
             map_img.setAttribute("class", "img-fluid mh-100 mw-100");
             map_img.setAttribute("style", "position: absolute;");
             map_img.setAttribute(  "src", map_img_url);
-            const mi_w = map_img.naturalWidth;
-            const mi_h = map_img.naturalHeight;
+            map_img.addEventListener("load", img_resize_svg)
 
             const map_svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             map_svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
             map_svg.setAttribute(   "id", map_svg_id);
             map_svg.setAttribute("class", "img-fluid mh-100 mw-100");
             map_svg.setAttribute("style", "position: absolute");
-            map_svg.setAttribute("viewBox", `0 0 1177 1177`)
-            //map_svg.setAttribute("viewBox", `0 0 ${mi_w} ${mi_h}`)
+            map_svg.setAttribute("viewBox", `0 0 1177 1177`);
 
             test_cross = gen_svg_cross(100, 100, 50);
             map_svg.appendChild(test_cross);
@@ -150,6 +150,7 @@ async function resetTabs() {
         e_tabcontent.firstElementChild.setAttribute(      "class", "tab-pane fade h-100 w-100 show active");
         e_content.appendChild(e_tabstrip);
         e_content.appendChild(e_tabcontent);
+        console.log("Applying loaded data to HTML document... (hi-res images may take some time on slower internet connections)")
         expac_tabs_buttons.appendChild(e_button);
         expac_tabs_content.appendChild(e_content);
     }
@@ -184,6 +185,17 @@ function gen_svg_cross(x, y, r, f="red", r_edge=0.1) {
     cross.setAttribute("points", `${lo} ${tr},  ${x} ${te},  ${ro} ${tr},  ${rr} ${to},  ${re} ${y},  ${rr} ${bo},  ${ro} ${br},  ${x} ${be},  ${lo} ${br},  ${lr} ${bo},  ${le} ${y},  ${lr} ${to}`)
     cross.setAttribute("fill", f);
     return cross
+}
+
+function img_resize_svg(e) {
+    map_img = e.target;
+    map_svg_id = `${map_img.id}-overlay`;
+    map_svg = document.getElementById(map_svg_id);
+    const mi_w = map_img.naturalWidth;
+    const mi_h = map_img.naturalHeight;
+    map_svg.setAttribute("viewBox", `0 0 ${mi_w} ${mi_h}`)
+
+    console.log(`Resized ${map_svg_id} to ${mi_w}x${mi_h}`);
 }
 
 let index_url;
