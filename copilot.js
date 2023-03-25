@@ -11,6 +11,16 @@ async function resetTabs() {
     // content template: <div class="tab-pane fade" id="expac-tabs-replaceme-content" role="tabpanel" aria-labelledby="expac-tabs-replaceme-button">ReplaceMe Data</div>
     const expac_tabs_buttons = document.getElementById('expac-tabs-buttons');
     const expac_tabs_content = document.getElementById('expac-tabs-content');
+    preserved_child_names = [
+        "setting-tabs-maps",
+        "setting-tabs-settings",
+    ]
+    preserved_child_tabs = [];
+    preserved_child_content = [];
+    for (const c of preserved_child_names) {
+        preserved_child_tabs.push(document.getElementById(`${c}-button`));
+        preserved_child_content.push(document.getElementById(`${c}-content`));
+    }
     expac_tabs_buttons.innerHTML = "";
     expac_tabs_content.innerHTML = "";
     const img_url_base = new URL(index_url)
@@ -24,7 +34,7 @@ async function resetTabs() {
         const e_button = document.createElement('button');
         e_button.setAttribute(            "id", e_button_id);
         e_button.setAttribute(         "class", "nav-link");
-        e_button.setAttribute( "data-bs-theme", "dark");
+        //e_button.setAttribute( "data-bs-theme", "dark");
         e_button.setAttribute("data-bs-toggle", "pill");
         e_button.setAttribute("data-bs-target", `#${e_content_id}`);
         e_button.setAttribute(          "type", "button");
@@ -42,13 +52,13 @@ async function resetTabs() {
         // tabstrip: <ul class="nav nav-tabs" id="myTab" role="tablist">
         e_tabstrip.setAttribute(        "class", "nav nav-tabs");
         e_tabstrip.setAttribute(           "id", `expac-tabs-${e_id}-tabstrip`);
-        e_tabstrip.setAttribute("data-bs-theme", "dark");
+        //e_tabstrip.setAttribute("data-bs-theme", "dark");
         e_tabstrip.setAttribute(         "role", "tablist");
         // tab content: <div class="tab-content" id="myTabContent">
         const e_tabcontent = document.createElement("div");
         e_tabcontent.setAttribute(        "class", "tab-content h-100 w-100");
         e_tabcontent.setAttribute(           "id", `expac-tabs-${e_id}-tabcontent`);
-        e_tabcontent.setAttribute("data-bs-theme", "dark");
+        //e_tabcontent.setAttribute("data-bs-theme", "dark");
         e_tabcontent.setAttribute(        "style", "position: relative;");
         for (let mx=0; mx<map_index['expansions'][e]["maps"].length; mx++) {
             m = map_index['expansions'][e]["maps"][mx]
@@ -129,6 +139,12 @@ async function resetTabs() {
         console.log("Applying loaded data to HTML document... (hi-res images may take some time on slower internet connections)")
         expac_tabs_buttons.appendChild(e_button);
         expac_tabs_content.appendChild(e_content);
+    }
+    for (const c of preserved_child_tabs) {
+        expac_tabs_buttons.appendChild(c);
+    }
+    for (const c of preserved_child_content) {
+        expac_tabs_content.appendChild(c);
     }
     expac_tabs_buttons.firstElementChild.setAttribute(        "class", "nav-link active");
     expac_tabs_buttons.firstElementChild.setAttribute("aria-selected", true);
