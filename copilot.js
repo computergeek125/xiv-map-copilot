@@ -1,12 +1,59 @@
-async function loadIndex() {
-    index_url = new URL(document.getElementById("index-location").value);
-    map_index = await fetchJSON(index_url);
-    document.getElementById('index-loader').remove();
-    console.log(`Loaded map index from ${index_url}`);
-    await resetTabs();
+let settings = {
+    "data_url": null,
+    "server_info": null,
+    "light_mode": false,
+};
+let map_index;
+let wp;
+
+async function init() {
+    try {
+        for (const s in settings_preload) {
+            settings[s] = settings_preload[s];
+        }
+    } catch (ReferenceError){
+        console.log("settings_preload not defined, proceeding");
+    }
+    if (settings["light_mode"]) {
+        document.documentElement.setAttribute('data-bs-theme','light');
+    } else {
+        document.documentElement.setAttribute('data-bs-theme','dark');
+    }
+    if (settings["data_url"]) {
+        await load_data(settings["data_url"]);
+    }
 }
 
-async function resetTabs() {
+async function load_data(url=null) {
+    const data_loader = document.getElementById('data-loader');
+    let data_url;
+    if (url == null) {
+        data_url = new URL(document.getElementById("data-location").value);
+    } else {
+        data_url = new URL(url);
+    }
+    if (data_url.pathname.slice(-1) != "/") {
+        data_url += "/";
+    }
+    map_index_url = new URL("index.json", data_url)
+    map_index = await fetchJSON(map_index_url);
+    if (settings["server_info"]) {
+        wp = new XIV_WorldParser(settings["server_info"]);
+    } else {
+        try {
+            wp = new XIV_WorldParser(new URL("servers.json", data_url));
+        } catch (TypeError) {
+            wp = new XIV_WorldParser("./servers.json");
+        }
+    }
+    if (data_loader != null) {
+        data_loader.remove();
+    }
+    console.log(`Loaded map index from ${map_index_url}`);
+    await resetTabs(data_url);
+}
+
+async function resetTabs(data_url) {
     // button template: <button class="nav-link" id="expac-tabs-replaceme-button" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#expac-tabs-replaceme-content" type="button" role="tab" aria-controls="expac-tabs-replaceme-content" aria-selected="false">ReplaceMe</button>'
     // content template: <div class="tab-pane fade" id="expac-tabs-replaceme-content" role="tabpanel" aria-labelledby="expac-tabs-replaceme-button">ReplaceMe Data</div>
     const expac_tabs_buttons = document.getElementById('expac-tabs-buttons');
@@ -27,8 +74,9 @@ async function resetTabs() {
     }
     expac_tabs_buttons.innerHTML = "";
     expac_tabs_content.innerHTML = "";
-    const img_url_base = new URL(index_url)
-    img_url_base.pathname.split('/').slice(0,-1).join("/")
+    //const img_url_base = new URL(index_url);
+    //img_url_base.pathname.split('/').slice(0,-1).join("/");
+    const img_url_base = new URL(data_url);
     for (const e in map_index['expansions']) {
         const e_id = e;
         const e_button_id  = `expac-tabs-${e_id}-button`;
@@ -154,6 +202,3 @@ async function resetTabs() {
     expac_tabs_buttons.firstElementChild.setAttribute("aria-selected", true);
     expac_tabs_content.firstElementChild.classList.add("show", "active");
 }
-
-let index_url;
-let map_index;
