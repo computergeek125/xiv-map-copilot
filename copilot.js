@@ -18,8 +18,12 @@ async function resetTabs() {
     preserved_child_tabs = [];
     preserved_child_content = [];
     for (const c of preserved_child_names) {
-        preserved_child_tabs.push(document.getElementById(`${c}-button`));
-        preserved_child_content.push(document.getElementById(`${c}-content`));
+        c_tab = document.getElementById(`${c}-button`);
+        c_tab.classList.remove("active");
+        c_content = document.getElementById(`${c}-content`)
+        c_content.classList.remove("show", "active");
+        preserved_child_tabs.push(c_tab);
+        preserved_child_content.push(c_content);
     }
     expac_tabs_buttons.innerHTML = "";
     expac_tabs_content.innerHTML = "";
@@ -131,9 +135,9 @@ async function resetTabs() {
             e_tabstrip.appendChild(map_tab_li);
             e_tabcontent.appendChild(map_content);
         }
-        e_tabstrip.firstElementChild.firstElementChild.setAttribute("class", "nav-link active");
+        e_tabstrip.firstElementChild.firstElementChild.classList.add("active");
         e_tabstrip.firstElementChild.setAttribute("aria-selected", true);
-        e_tabcontent.firstElementChild.setAttribute(      "class", "tab-pane fade h-100 w-100 show active");
+        e_tabcontent.firstElementChild.classList.add("show", "active");
         e_content.appendChild(e_tabstrip);
         e_content.appendChild(e_tabcontent);
         console.log("Applying loaded data to HTML document... (hi-res images may take some time on slower internet connections)")
@@ -146,9 +150,9 @@ async function resetTabs() {
     for (const c of preserved_child_content) {
         expac_tabs_content.appendChild(c);
     }
-    expac_tabs_buttons.firstElementChild.setAttribute(        "class", "nav-link active");
+    expac_tabs_buttons.firstElementChild.classList.add("active");
     expac_tabs_buttons.firstElementChild.setAttribute("aria-selected", true);
-    expac_tabs_content.firstElementChild.setAttribute(        "class", "tab-pane fade h-100 w-100 show active");
+    expac_tabs_content.firstElementChild.classList.add("show", "active");
 }
 
 let index_url;
