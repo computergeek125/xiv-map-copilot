@@ -4,6 +4,7 @@ let settings = {
     "light_mode": false,
 };
 let map_index;
+let map_reverse_lookup = {};
 let wp;
 
 async function init() {
@@ -11,8 +12,8 @@ async function init() {
         for (const s in settings_preload) {
             settings[s] = settings_preload[s];
         }
-    } catch (ReferenceError){
-        console.log("settings_preload not defined, proceeding");
+    } catch (e) {
+        console.log(`settings_preload likely not defined, proceeding (${e})`);
     }
     if (settings["light_mode"]) {
         document.documentElement.setAttribute('data-bs-theme','light');
@@ -37,20 +38,38 @@ async function load_data(url=null) {
     }
     map_index_url = new URL("index.json", data_url)
     map_index = await fetchJSON(map_index_url);
+    console.log(`Loaded map index from ${map_index_url}, resetting tabs async and building reverse lookup`);
+    map_reverse_lookup = {};
+    reset_tabs_promise = resetTabs(data_url);
     if (settings["server_info"]) {
         wp = new XIV_WorldParser(settings["server_info"]);
+        await wp.init();
     } else {
         try {
             wp = new XIV_WorldParser(new URL("servers.json", data_url));
-        } catch (TypeError) {
-            wp = new XIV_WorldParser("./servers.json");
+            wp.init();
+        } catch (e) {
+            if (e instanceof TypeError) {
+                wp = new XIV_WorldParser("./servers.json");
+                wp.init()
+            } else {
+                throw new e;
+                return;
+            }
         }
     }
     if (data_loader != null) {
         data_loader.remove();
     }
-    console.log(`Loaded map index from ${map_index_url}`);
-    await resetTabs(data_url);
+    
+    reset_tabs_promise.then(
+        (value) => {
+            console.log("Finished resetting tabs");
+        },
+        (reason) => {
+            console.log("Failed to reset tabs");
+        }
+    );
 }
 
 async function resetTabs(data_url) {
@@ -118,7 +137,12 @@ async function resetTabs(data_url) {
             const map_info = map_index["map_info"][m];
             const map_id = m.replaceAll("/", ":");
             //console.log(map_info);
-            const map_name = sanitizeHTML(map_info["name"]);
+            const map_name = map_info["name"];
+            const reverse_struct = [e, m];
+            map_reverse_lookup[map_name] = reverse_struct;
+            if (settings["debug"]) {
+                console.log(`Adding reverse map from ${map_name} to ${reverse_struct}`);
+            }
             const map_button_id =  `expac-tabs-${e_id}-map-${map_id}-tab`;
             const map_content_id = `expac-tabs-${e_id}-map-${map_id}-content`;
             // tab: <li class="nav-item" role="presentation">
@@ -201,4 +225,36 @@ async function resetTabs(data_url) {
     expac_tabs_buttons.firstElementChild.classList.add("active");
     expac_tabs_buttons.firstElementChild.setAttribute("aria-selected", true);
     expac_tabs_content.firstElementChild.classList.add("show", "active");
+}
+
+function _map_add_flag(map_string) {
+    if (map_string) {
+        try {
+            console.log(new XIV_MapFlag(map_string, wp, map_reverse_lookup));
+        } catch (e) {
+            if (e instanceof XIV_ParseError) {
+                console.error(`Failed to parse ${map_string} with error ${e}`);
+            } else {
+                throw new e;
+            }
+        }
+    } else {
+        console.log("Refusing to parse empty string");
+    }
+}
+
+function map_add_flag() {
+    input_map_element = document.getElementById("input-new-map-string");
+    map_string = input_map_element.value;
+    _map_add_flag(map_string);
+    input_map_element.value = "";
+}
+
+function map_bulk_import() {
+    input_bulk_element = document.getElementById('input-new-map-bulk');
+    input_bulk_value = input_bulk_element.value.split("\n");
+    for (const line of input_bulk_value) {
+        _map_add_flag(line);
+    }
+    input_bulk_element.value = "";
 }

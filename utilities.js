@@ -78,3 +78,96 @@ function jedi_sith() {
         document.documentElement.setAttribute('data-bs-theme','dark')
     }
 }
+
+const frens = [
+    "Alka Zolka",
+    "Alianne Vellegrance",
+    "Alisaie Leveilleur",
+    "Almet",
+    "Alphinaud Leveilleur",
+    "Arenvald Lentinus",
+    "Arya Gastaurknan",
+    "Brayflox Alltalks",
+    "Broken Mountain",
+    "Steelarm Cerigg",
+    "Cid Garlond",
+    "Cirina Mol",
+    "Chuchuto Chuto",
+    "Coultenet Dailebaure",
+    "Curious Gorge",
+    "Cymet",
+    "Dorgono Qerel",
+    "Eschiva Keyes",
+    "Estinien Wyrmblood",
+    "Fran Eruyt",
+    "F'lhaminn Qesh",
+    "Giott",
+    "Gosetsu Everfall",
+    "Granson",
+    "G'raha Tia",
+    "Hamon Holyfist",
+    "Haurchefant Greystone",
+    "Hoary Boulder",
+    "Jacke Swallow",
+    "Koh Rabntah",
+    "K'lyhia",
+    "Lalah Jinjahl",
+    "Lalai Lai",
+    "Leih Aliapoh",
+    "Leveva Byrde",
+    "Lilja Sjasaris",
+    "Loonh Gah",
+    "Lue-Reeq",
+    "Lyna",
+    "Krile Baldesion",
+    "Makoto Obinata",
+    "Mikoto Jinba",
+    "Minfilia Warde",
+    "M'naago Rahz",
+    "Moenbryda Wilfsunnwyn",
+    "Oboro Torioi",
+    "Ocher Boulder",
+    "Ogul Khatayin",
+    "Papalymo Totolymo",
+    "Pipin Tarupin",
+    "Radovan",
+    "Ranaa Mihgo",
+    "Riol Forrest",
+    "Rhesh Polaali",
+    "Sadu Dotharl",
+    "Sidurgu Orl",
+    "Sophie",
+    "Stacia Myste",
+    "Sylphie Webb",
+    "Tataru Taru",
+    "Thancred Waters",
+    "Tsubame Oshidari",
+    "Uimet",
+    "Urianger Augurelt",
+    "V'kebbe",
+    "X'rhun Tia",
+    "Yugiri Mistwalker",
+    "Yuki Yatsurugi",
+    "Y'shtola Rhul",
+    "Y'mhitra Rhul",
+    "Yda Hext",
+    ]
+
+function name_a_friend(chance=0.25) {
+    let name;
+    let applied;
+    const rname = frens[Math.floor(Math.random() * frens.length)];
+    if (Math.random() <= chance ){
+        // [21:42] (Warrior Oflight) >The Ruby Sea ( 5.3  , 14.8 )
+        name = rname;
+        applied = "APPLIED";
+    } else {
+        name = "W'arrior O'light";
+        applied = "default";
+    }
+    if (settings["debug_frens"]) {
+        console.log(applied, rname);
+    }
+    const data = `[21:42] ${name} >The Ruby Sea ( 5.3  , 14.8 )`;
+    document.getElementById("input-new-map-string").placeholder = data;
+}
