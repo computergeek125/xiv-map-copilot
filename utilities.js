@@ -69,3 +69,12 @@ function img_resize_svg(e) {
 
     console.log(`Resized ${map_svg_id} to ${mi_w}x${mi_h}`);
 }
+
+function jedi_sith() {
+    if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
+        document.documentElement.setAttribute('data-bs-theme','light')
+    }
+    else {
+        document.documentElement.setAttribute('data-bs-theme','dark')
+    }
+}

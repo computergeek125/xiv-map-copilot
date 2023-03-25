@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html data-bs-theme="dark" lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,30 +9,75 @@
     <script src="./copilot.js"></script>
     <script src="./utilities.js"></script>
   </head>
-  <body data-bs-theme="dark" style="height: 96vh;">
+  <body style="height: 96vh;">
     <div class="container-flex p-3 m-0 h-100 w-100">
       <div id="index-loader" class="row p-0 align-items-start">
         <div class="col p-2 input-group mb-12">
           <div class="input-group-prepend">
-            <button class="btn btn-primary" data-bs-theme="dark" type="button" onclick="loadIndex()">Load index</button>
+            <button class="btn btn-primary" type="button" onclick="loadIndex()">Load index</button>
           </div>
-          <input id="index-location" type="text" class="form-control" data-bs-theme="dark" placeholder="Index URL" aria-label="Index URL" aria-describedby="basic-addon2" />
+          <input id="index-location" type="text" class="form-control" placeholder="Index URL" aria-label="Index URL" aria-describedby="basic-addon2" />
         </div>
       </div>
       <div id="main-area" class="row p-0 h-100 w-100 align-items-start" style="position: relative;">
         <div id="expac-tabs-buttons" class="col-2 p-2 nav flex-column nav-pills h-100" role="tablist" aria-orientation="vertical" style="position: relative;">
-          <button class="nav-link active" id="v-pills-arr-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-arr" type="button" role="tab" aria-controls="v-pills-arr" aria-selected="true">ARR</button>
-          <button class="nav-link" id="v-pills-hw-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-hw" type="button" role="tab" aria-controls="v-pills-hw" aria-selected="false">Heavensward</button>
-          <button class="nav-link" id="v-pills-sb-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-sb" type="button" role="tab" aria-controls="v-pills-sb" aria-selected="false">Stormblood</button>
-          <button class="nav-link" id="v-pills-shb-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-shb" type="button" role="tab" aria-controls="v-pills-shb" aria-selected="false">Shadowbringers</button>
-          <button class="nav-link" id="v-pills-ew-tab" data-bs-theme="dark" data-bs-toggle="pill" data-bs-target="#v-pills-ew" type="button" role="tab" aria-controls="v-pills-ew" aria-selected="false">Endwalker</button>
+          <button class="nav-link active" id="expac-tabs-arr-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-arr-content" type="button" role="tab" aria-controls="expac-tabs-arr-content" aria-selected="true">ARR</button>
+          <button class="nav-link" id="expac-tabs-hw-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-hw-content" type="button" role="tab" aria-controls="expac-tabs-hw-content" aria-selected="false">Heavensward</button>
+          <button class="nav-link" id="expac-tabs-sb-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-sb-content" type="button" role="tab" aria-controls="expac-tabs-sb-content" aria-selected="false">Stormblood</button>
+          <button class="nav-link" id="expac-tabs-shb-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-shb-content" type="button" role="tab" aria-controls="expac-tabs-shb-content" aria-selected="false">Shadowbringers</button>
+          <button class="nav-link" id="expac-tabs-ew-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-ew-content" type="button" role="tab" aria-controls="expac-tabs-ew-content" aria-selected="false">Endwalker</button>
+          <button class="nav-link" id="setting-tabs-maps-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-maps-content" type="button" role="tab" aria-controls="setting-tabs-maps-content" aria-selected="false">Map List</button>
+          <button class="nav-link" id="setting-tabs-settings-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-settings-content" type="button" role="tab" aria-controls="setting-tabs-settings-content" aria-selected="false">Settings</button>
         </div>
         <div id="expac-tabs-content" class="col p-2 tab-content h-100 w-100" style="position: relative;">
-          <div class="tab-pane fade show active" id="v-pills-arr" role="tabpanel" aria-labelledby="v-pills-arr-tab">A Realm Reborn Placeholder Data</div>
-          <div class="tab-pane fade" id="v-pills-hw" role="tabpanel" aria-labelledby="v-pills-hw-tab">Heavensward Placeholder Data</div>
-          <div class="tab-pane fade" id="v-pills-sb" role="tabpanel" aria-labelledby="v-pills-sb-tab">Stormblood Placeholder Data</div>
-          <div class="tab-pane fade" id="v-pills-shb" role="tabpanel" aria-labelledby="v-pills-shb-tab">Shadowbringers Placeholder Data</div>
-          <div class="tab-pane fade" id="v-pills-ew" role="tabpanel" aria-labelledby="v-pills-ew-tab">Endwalker Placeholder Data</div>
+          <div class="tab-pane fade show active" id="expac-tabs-arr-content" role="tabpanel" aria-labelledby="expac-tabs-arr-button">A Realm Reborn Placeholder Data</div>
+          <div class="tab-pane fade" id="expac-tabs-hw-content" role="tabpanel" aria-labelledby="expac-tabs-hw-button">Heavensward Placeholder Data</div>
+          <div class="tab-pane fade" id="expac-tabs-sb-content" role="tabpanel" aria-labelledby="expac-tabs-sb-button">Stormblood Placeholder Data</div>
+          <div class="tab-pane fade" id="expac-tabs-shb-content" role="tabpanel" aria-labelledby="expac-tabs-shb-button">Shadowbringers Placeholder Data</div>
+          <div class="tab-pane fade" id="expac-tabs-ew-content" role="tabpanel" aria-labelledby="expac-tabs-ew-button">Endwalker Placeholder Data</div>
+          <div class="tab-pane fade" id="setting-tabs-maps-content" role="tabpanel" aria-labelledby="setting-tabs-maps-button">
+            <div class="d-flex flex-column">
+              <div class="input-group p-2">
+                <div class="input-group-prepend">
+                  <button class="btn btn-primary" type="button" onclick="map_add()">Add map</button>
+                </div>
+                <input type="text" class="form-control" id="input-new-map-string" placeholder="[21:42] (Warrior Oflight) >The Ruby Sea ( 5.3  , 14.8 )">
+              </div>
+              <div class="form-group p-2">
+                <label for="map-list-selectable">Current map list:</label>
+                <select multiple class="form-control" id="map-list-selectable" size=10>
+                  <option>Map 1</option>
+                  <option>Map 2</option>
+                  <option>Map 3</option>
+                  <option>Map 4</option>
+                  <option>Map 5</option>
+                </select>
+              </div>
+              <div class="form-group p-2">
+                <textarea class="form-control" id="input-new-map-bulk" rows="6"></textarea>
+                <button class="btn btn-primary" type="button" onclick="map_bulk_import()">Bulk import</button>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="setting-tabs-settings-content" role="tabpanel" aria-labelledby="setting-tabs-settings-button">
+            <div class="d-flex flex-column">
+              <div class="form-group p-2 me-auto">
+                <button class="btn btn-primary" onclick="jedi_sith()">Toggle dark/light mode</button>
+              </div>
+              <div class="form-group p-2">
+                <label for="setting-preload-map-index-label">Preload map index</label>
+                <input type="text" class="form-control" id="setting-preload-map-index" aria-describedby="setting-preload-map-index-help" placeholder="https://example.com/maps/index.json">
+                <small id="setting-preload-map-index-help" class="form-text text-muted">This index will be preloaded at application start, instead of having to enter the field at the top every time</small>
+              </div>
+              <div class="form-group p-2">
+                <input type="checkbox" class="form-check-input" id="setting-test-checkbox">
+                <label class="form-check-label" for="setting-test-checkbox">Test Checkbox</label>
+              </div>
+              <div class="form-group p-2 me-auto">
+                <button class="btn btn-primary" onclick="save_settings()">Save</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
