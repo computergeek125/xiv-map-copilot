@@ -6,6 +6,7 @@ let settings = {
 let map_index;
 let map_reverse_lookup = {};
 let wp;
+const player_flag_list = {};
 
 async function init() {
     try {
@@ -13,7 +14,7 @@ async function init() {
             settings[s] = settings_preload[s];
         }
     } catch (e) {
-        console.log(`settings_preload likely not defined, proceeding (${e})`);
+        console.log(`noncritical problem preloading settings: ${e} <-- if this says that settings_preload is not defined, you (likely) do not have any issues`);
     }
     if (settings["light_mode"]) {
         document.documentElement.setAttribute('data-bs-theme','light');
@@ -228,18 +229,31 @@ async function resetTabs(data_url) {
 }
 
 function _map_add_flag(map_string) {
+    map_selector = document.getElementById("map-list-selectable");
     if (map_string) {
         try {
-            console.log(new XIV_MapFlag(map_string, wp, map_reverse_lookup));
+            new_flag = new XIV_MapFlag(map_string, wp, map_reverse_lookup);
+            new_flag_opt = document.createElement("option");
+            new_flag_opt.text = new_flag.toString();
+            map_selector.add(new_flag_opt);
+            console.log(`Added flag ${new_flag}`);
         } catch (e) {
             if (e instanceof XIV_ParseError) {
                 console.error(`Failed to parse ${map_string} with error ${e}`);
             } else {
-                throw new e;
+                throw e;
             }
         }
     } else {
         console.log("Refusing to parse empty string");
+    }
+}
+
+function _map_remove_flag(map_string) {
+    if (map_string) {
+        console.log(`Attempting to remove ${map_string}`);
+    } else {
+        console.log("Refusing to remove empty string");
     }
 }
 
@@ -257,4 +271,20 @@ function map_bulk_import() {
         _map_add_flag(line);
     }
     input_bulk_element.value = "";
+}
+
+function map_remove_selected() {
+    map_selector = document.getElementById("map-list-selectable");
+    selected_map = map_selector.value;
+    _map_remove_flag(selected_map);
+    map_selector.remove(map_selector.selectedIndex);
+}
+
+function map_clear_all() {
+    map_selector = document.getElementById("map-list-selectable");
+    for (let i=map_selector.options.length-1; i>=0; i--) {
+        selected_map = map_selector.options[i].value;
+        _map_remove_flag(selected_map);
+        map_selector.remove(i);
+    }
 }

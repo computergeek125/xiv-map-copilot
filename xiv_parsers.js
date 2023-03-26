@@ -46,7 +46,7 @@ class XIV_WorldParser {
             last_name = first_last[1];
             world_name = null;
         }
-        console.log(`${first_last[0]}/${last_name}/${world_name}`);
+        //console.log(`${first_last[0]}/${last_name}/${world_name}`);
         return [first_last[0], last_name, world_name];
     }
 }
@@ -56,12 +56,21 @@ class XIV_MapFlag {
     constructor(map_string, world_parser, reverse_lookup) {
         const match = map_string.match(map_pin_re);
         if (match) {
-            this.char_name = world_parser.parse_charname(match.slice(1)[0]);
-            this.map_area = reverse_lookup[match[1]];
-            this.coords = [match[2], match[3]];
+            this.char_name = world_parser.parse_charname(match[1]);
+            if (this.char_name[2] == null) {
+                this.char_name_str = `${this.char_name[0]} ${this.char_name[1]}`;
+            } else {
+                this.char_name_str = `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
+            }
+            this.map_name = match[2]
+            this.map_area = reverse_lookup[match[2]];
+            this.coords = [match[3], match[4]];
         } else {
             throw new XIV_ParseError("Unable to parse map string");
         }
+    }
+    toString() {
+        return `${this.char_name_str} --> ${this.map_name} @ (${this.coords[0]}, ${this.coords[1]})`
     }
     /*get char_name() {
         return this.char_name;
