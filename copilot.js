@@ -4,7 +4,7 @@ let settings = {
     "light_mode": false,
 };
 let map_index;
-let map_reverse_lookup = {};
+let xfc = new XIV_FlagClusterinator(map_index);
 let wp;
 const player_flag_list = {};
 
@@ -39,8 +39,8 @@ async function load_data(url=null) {
     }
     map_index_url = new URL("index.json", data_url)
     map_index = await fetchJSON(map_index_url);
-    console.log(`Loaded map index from ${map_index_url}, resetting tabs async and building reverse lookup`);
-    map_reverse_lookup = {};
+    console.log(`Loaded map index from ${map_index_url}, resetting tabs async and building data structures`);
+    xfc.clear()
     reset_tabs_promise = resetTabs(data_url);
     if (settings["server_info"]) {
         wp = new XIV_WorldParser(settings["server_info"]);
@@ -59,6 +59,7 @@ async function load_data(url=null) {
             }
         }
     }
+    xfc.wp = wp
     if (data_loader != null) {
         data_loader.remove();
     }
@@ -67,9 +68,9 @@ async function load_data(url=null) {
         (value) => {
             console.log("Finished resetting tabs");
         },
-        (reason) => {
-            console.log("Failed to reset tabs");
-        }
+        /*(reason) => {
+            console.log(`Failed to reset tabs: ${reason}`);
+        }*/
     );
 }
 
@@ -139,11 +140,7 @@ async function resetTabs(data_url) {
             const map_id = m.replaceAll("/", ":");
             //console.log(map_info);
             const map_name = map_info["name"];
-            const reverse_struct = [e, m];
-            map_reverse_lookup[map_name] = reverse_struct;
-            if (settings["debug"]) {
-                console.log(`Adding reverse map from ${map_name} to ${reverse_struct}`);
-            }
+            const xma = new XIV_MapArea(e, m, map_info);
             const map_button_id =  `expac-tabs-${e_id}-map-${map_id}-tab`;
             const map_content_id = `expac-tabs-${e_id}-map-${map_id}-content`;
             // tab: <li class="nav-item" role="presentation">
@@ -192,10 +189,10 @@ async function resetTabs(data_url) {
             map_svg.setAttribute("class", "img-fluid mh-100 mw-100");
             map_svg.setAttribute("style", "position: absolute");
             map_svg.setAttribute("viewBox", `0 0 1177 1177`);
+            xma.svg = map_svg;
 
-            test_cross = gen_svg_cross(100, 100, 50);
-            map_svg.appendChild(test_cross);
-
+            //test_cross = gen_svg_cross(100, 100, 50);
+            //map_svg.appendChild(test_cross);
 
             //const map_image = document.createElementNS("http://www.w3.org/2000/svg", "image");
             //map_image.setAttribute(  "id", map_img_id);
@@ -207,6 +204,8 @@ async function resetTabs(data_url) {
             map_content.appendChild(map_svg);
             e_tabstrip.appendChild(map_tab_li);
             e_tabcontent.appendChild(map_content);
+
+            xfc.add_map_area(xma);
         }
         e_tabstrip.firstElementChild.firstElementChild.classList.add("active");
         e_tabstrip.firstElementChild.setAttribute("aria-selected", true);
@@ -232,11 +231,15 @@ function _map_add_flag(map_string) {
     map_selector = document.getElementById("map-list-selectable");
     if (map_string) {
         try {
-            new_flag = new XIV_MapFlag(map_string, wp, map_reverse_lookup);
-            new_flag_opt = document.createElement("option");
-            new_flag_opt.text = new_flag.toString();
-            map_selector.add(new_flag_opt);
-            console.log(`Added flag ${new_flag}`);
+            new_flag = xfc.add_map_flag(map_string);
+            if (new_flag) {
+                new_flag_opt = document.createElement("option");
+                new_flag_opt.text = new_flag.toString();
+                map_selector.add(new_flag_opt);
+                console.log(`Added flag ${new_flag}`);
+            } else {
+                console.log(`Failed to add flag for ${map_string}`);
+            }
         } catch (e) {
             if (e instanceof XIV_ParseError) {
                 console.error(`Failed to parse ${map_string} with error ${e}`);
@@ -252,6 +255,7 @@ function _map_add_flag(map_string) {
 function _map_remove_flag(map_string) {
     if (map_string) {
         console.log(`Attempting to remove ${map_string}`);
+        xfc.remove_map_flag(map_string);
     } else {
         console.log("Refusing to remove empty string");
     }

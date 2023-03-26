@@ -31,7 +31,7 @@ function sanitizeHTML(str) {
  * @param {Float}   r_edge Edge offset as a decimal percentage of `r` - so 0.1 == 10%
  * @return {Object} cross  An SVG polygon cross that can be appended to an <svg> element
  */
-function gen_svg_cross(x, y, r, f="red", r_edge=0.1) {
+function gen_svg_cross(x, y, r, f="red", r_edge=0.25) {
     // cross: <polygon points="5 0, 25 20, 45 0, 50 5, 30 25, 50 45, 45 50, 25 30, 5 50, 0 45, 20 25, 0 5" fill="red" />
     //const cross_template = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     //cross_template.setAttribute("points", "5 0, 25 20, 45 0, 50 5, 30 25, 50 45, 45 50, 25 30, 5 50, 0 45, 20 25, 0 5");
