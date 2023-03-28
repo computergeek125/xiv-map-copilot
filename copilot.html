@@ -49,8 +49,8 @@
                 <label for="map-list-selectable">Current map list:</label>
                 <select multiple class="form-control" id="map-list-selectable" size=10>
                 </select>
-                <button class="btn btn-primary" type="button" onclick="map_remove_selected()">Remove selected</button>
-                <button class="btn btn-primary" type="button" onclick="map_clear_all()">Clear all</button>
+                <button class="btn btn-warning" type="button" onclick="map_remove_selected()">Remove selected</button>
+                <button class="btn btn-danger" type="button" onclick="map_clear_all()">Clear all</button>
               </div>
               <div class="form-group p-2">
                 <textarea class="form-control" id="input-new-map-bulk" rows="6"></textarea>
@@ -64,16 +64,18 @@
                 <button class="btn btn-primary" onclick="jedi_sith()">Toggle dark/light mode</button>
               </div>
               <div class="form-group p-2">
-                <label for="setting-preload-map-index-label">Preload map index</label>
-                <input type="text" class="form-control" id="setting-preload-map-index" aria-describedby="setting-preload-map-index-help" placeholder="https://example.com/maps/index.json">
-                <small id="setting-preload-map-index-help" class="form-text text-muted">This index will be preloaded at application start, instead of having to enter the field at the top every time</small>
+                <label for="setting-preload-map-data-label">Preload data pack</label>
+                <input type="text" class="form-control" id="setting-preload-map-data" aria-describedby="setting-preload-map-data-help" placeholder="https://example.com/maps/index.json">
+                <small id="setting-preload-map-data-help" class="form-text text-muted">This data pack will be preloaded at application start, instead of having to enter the field at the top every time</small>
               </div>
               <div class="form-group p-2">
                 <input type="checkbox" class="form-check-input" id="setting-test-checkbox">
                 <label class="form-check-label" for="setting-test-checkbox">Test Checkbox</label>
               </div>
               <div class="form-group p-2 me-auto">
-                <button class="btn btn-primary" onclick="save_settings()">Save</button>
+                <button class="btn btn-primary" onclick="apply_settings()">Apply</button>
+                <button class="btn btn-secondary" onclick="persist_settings()">Persist</button>
+                <button class="btn btn-danger" onclick="reset_settings()">Reset</button>
               </div>
             </div>
           </div>

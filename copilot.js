@@ -3,6 +3,7 @@ let settings = {
     "server_info": null,
     "light_mode": false,
 };
+let user_settings = {};
 let map_index;
 let xfc = new XIV_FlagClusterinator(map_index);
 let wp;
@@ -16,6 +17,43 @@ async function init() {
     } catch (e) {
         console.log(`noncritical problem preloading settings: ${e} <-- if this says that settings_preload is not defined, you (likely) do not have any issues`);
     }
+    try {
+        const local_settings_str = localStorage.getItem("settings");
+        let local_settings;
+        if (local_settings_str) {
+            console.log("Loading local settings");
+            local_settings = JSON.parse(local_settings_str)
+            console.log(local_settings);
+        } else {
+            console.log("Local settings empty (nothing to load there)")
+        }
+        for (const s in local_settings) {
+            user_settings[s] = local_settings[s];
+        }
+    } catch (e) {
+        console.log(`noncritical problem loading local settings: ${e} <-- if you are using this locally (as in, not on a website), this error can be ignored`);
+    }
+    try {
+        const session_settings_str = sessionStorage.getItem("settings");
+        let session_settings;
+        if (session_settings_str) {
+            console.log("Loading session settings");
+            session_settings = JSON.parse(session_settings_str);
+            console.log(session_settings);
+        } else {
+            console.log("Session settings empty (nothing to load there)");
+        }
+        for (const s in session_settings) {
+            user_settings[s] = session_settings[s];
+        }
+    } catch (e) {
+        console.log(`noncritical problem loading session settings: ${e} <-- if you are using this locally (as in, not on a website), this error can be ignored`);
+    }
+    console.log("Loaded aggregate user settings:", settings["light_mode"]);
+    for (const s in user_settings) {
+        settings[s] = user_settings[s];
+    }
+    load_settings_page();
     if (settings["light_mode"]) {
         document.documentElement.setAttribute('data-bs-theme','light');
     } else {
@@ -291,4 +329,40 @@ function map_clear_all() {
         _map_remove_flag(selected_map);
         map_selector.remove(i);
     }
+}
+
+function get_settings_page_json() {
+    const settings_page = {};
+    light_mode = document.documentElement.getAttribute('data-bs-theme') == 'light';
+    data_url = document.getElementById("setting-preload-map-data").value;
+
+    settings_page["light_mode"] = light_mode;
+    if (data_url) {
+        settings_page["data_url"] = data_url;
+    }
+
+    return settings_page;
+}
+
+function load_settings_page() {
+    if (user_settings["data_url"]) {
+        document.getElementById("setting-preload-map-data").value = user_settings["data_url"];
+    }
+}
+
+function apply_settings() {
+    const settings_page = get_settings_page_json();
+    sessionStorage.setItem("settings", JSON.stringify(settings_page));
+    init();
+}
+
+function persist_settings() {
+    const settings_page = get_settings_page_json();
+    localStorage.setItem("settings", JSON.stringify(settings_page));
+    init();
+}
+
+function reset_settings() {
+    localStorage.clear();
+    sessionStorage.clear();
 }
