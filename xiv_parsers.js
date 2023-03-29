@@ -51,7 +51,7 @@ class XIV_WorldParser {
     }
 }
 
-const map_pin_re = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
+const map_pin_re = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w' ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
 class XIV_MapFlag {
     constructor(map_string, world_parser, maps, reverse_lookup) {
         const match = map_string.match(map_pin_re);
