@@ -165,7 +165,7 @@ function name_a_friend(chance=0.25) {
         name = "W'arrior O'light";
         applied = "default";
     }
-    if (settings["debug_frens"]) {
+    if (settings.get("debug_frens")) {
         console.log(applied, rname);
     }
     const data = `[21:42] ${name} >The Ruby Sea ( 5.3  , 14.8 )`;

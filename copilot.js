@@ -1,8 +1,8 @@
-let settings = {
-    "data_url": null,
-    "server_info": null,
-    "light_mode": false,
-};
+let settings = new Map([
+    ["data_url", null],
+    ["server_info", null],
+    ["light_mode", false],
+]);
 let user_settings = new Map();
 let session_cache = new Map();
 let map_index;
@@ -13,7 +13,7 @@ const player_flag_list = new Map();
 async function init() {
     try {
         for (const s in settings_preload) {
-            settings[s] = settings_preload[s];
+            settings.set(s, settings_preload[s]);
         }
     } catch (e) {
         console.log(`noncritical problem preloading settings: ${e} <-- if this says that settings_preload is not defined, you (likely) do not have any issues`);
@@ -23,47 +23,49 @@ async function init() {
         let local_settings;
         if (local_settings_str) {
             console.log("Loading local settings");
-            local_settings = JSON.parse(local_settings_str)
+            local_settings = new Map(Object.entries(JSON.parse(local_settings_str)));
             console.log(local_settings);
         } else {
-            console.log("Local settings empty (nothing to load there)")
+            console.log("Local settings empty (nothing to load there)");
         }
-        for (const s in local_settings) {
-            user_settings[s] = local_settings[s];
+        for (const s of local_settings.keys()) {
+            console.log(`local: setting ${s} -> ${local_settings.get(s)}`);
+            user_settings.set(s, local_settings.get(s));
         }
     } catch (e) {
-        console.log(`noncritical problem loading local settings: ${e} <-- if you are using this locally (as in, not on a website), this error can be ignored`);
+        console.log(`noncritical problem loading local settings: ${e} <-- if you are using this locally (as in, not on a website), this error might be able to be ignored`);
     }
     try {
         const session_settings_str = sessionStorage.getItem("settings");
         let session_settings;
         if (session_settings_str) {
             console.log("Loading session settings");
-            session_settings = JSON.parse(session_settings_str);
+            session_settings = new Map(Object.entries(JSON.parse(session_settings_str)));
             console.log(session_settings);
         } else {
             console.log("Session settings empty (nothing to load there)");
         }
-        for (const s in session_settings) {
-            user_settings[s] = session_settings[s];
+        for (const s of session_settings.keys()) {
+            console.log(`session: setting ${s} -> ${session_settings.get(s)}`);
+            user_settings.set(s, session_settings.get(s));
         }
     } catch (e) {
-        console.log(`noncritical problem loading session settings: ${e} <-- if you are using this locally (as in, not on a website), this error can be ignored`);
+        console.log(`noncritical problem loading session settings: ${e} <-- if you are using this locally (as in, not on a website), this error might be able to be ignored`);
     }
-    console.log("Loaded aggregate user settings:", settings["light_mode"]);
-    for (const s in user_settings) {
-        settings[s] = user_settings[s];
+    console.log("Loaded aggregate user settings:", settings);
+    for (const s of user_settings.keys()) {
+        settings.set(s, user_settings.get(s));
     }
     load_settings_page();
-    if (settings["light_mode"]) {
+    if (settings.get("light_mode")) {
         document.documentElement.setAttribute('data-bs-theme','light');
     } else {
         document.documentElement.setAttribute('data-bs-theme','dark');
     }
-    if (settings["data_url"]) {
-        await load_data(settings["data_url"]);
+    if (settings.get("data_url")) {
+        await load_data(settings.get("data_url"));
     }
-    if (settings["session_cache"]) {
+    if (settings.get("session_cache")) {
         try {
             const session_cache_str = sessionStorage.getItem("session_cache");
             let session_cache;
@@ -97,10 +99,10 @@ async function load_data(url=null) {
     map_index_url = new URL("index.json", data_url)
     map_index = await fetchJSON(map_index_url);
     console.log(`Loaded map index from ${map_index_url}, resetting tabs async and building data structures`);
-    xfc.clear()
+    xfc.reset_maps()
     reset_tabs_promise = resetTabs(data_url);
-    if (settings["server_info"]) {
-        wp = new XIV_WorldParser(settings["server_info"]);
+    if (settings.get("server_info")) {
+        wp = new XIV_WorldParser(settings.get("server_info"));
         await wp.init();
     } else {
         try {
@@ -358,38 +360,38 @@ function map_clear_all() {
     }
 }
 
-function get_settings_page_json() {
+function get_settings_page_data() {
     const settings_page = new Map();
     light_mode = document.documentElement.getAttribute('data-bs-theme') == 'light';
     data_url = document.getElementById("setting-preload-map-data").value;
     session_cache = document.getElementById("setting-session-cache").checked;
 
-    settings_page["light_mode"] = light_mode;
+    settings_page.set("light_mode", light_mode);
     if (data_url) {
-        settings_page["data_url"] = data_url;
+        settings_page.set("data_url", data_url);
     }
-    settings_page["session_cache"] = session_cache;
+    settings_page.set("session_cache", session_cache);
 
     return settings_page;
 }
 
 function load_settings_page() {
-    if (user_settings["data_url"]) {
-        document.getElementById("setting-preload-map-data").value = user_settings["data_url"];
+    if (user_settings.get("data_url")) {
+        document.getElementById("setting-preload-map-data").value = user_settings.get("data_url");
     }
-    if (user_settings["session_cache"]) {
-        document.getElementById("setting-session-cache").checked = user_settings["session_cache"];
+    if (user_settings.get("session_cache")) {
+        document.getElementById("setting-session-cache").checked = user_settings.get("session_cache");
     }
 }
 
 function apply_settings() {
-    const settings_page = get_settings_page_json();
+    const settings_page = Object.fromEntries(get_settings_page_data());
     sessionStorage.setItem("settings", JSON.stringify(settings_page));
     init();
 }
 
 function persist_settings() {
-    const settings_page = get_settings_page_json();
+    const settings_page = Object.fromEntries(get_settings_page_data());
     localStorage.setItem("settings", JSON.stringify(settings_page));
     init();
 }

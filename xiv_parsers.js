@@ -8,7 +8,7 @@ class XIV_WorldParser {
         this.reverse_servers = new Map();
         for (const [datacenter, server_list] of Object.entries(this.datacenter_server)) {
             for (const server of server_list) {
-                this.reverse_servers[server] = datacenter;
+                this.reverse_servers.set(server, datacenter);
             }
         }
     }
@@ -38,7 +38,7 @@ class XIV_WorldParser {
         if (sn_idx) {
             last_name = first_last[1].slice(0, sn_idx);
             world_name = first_last[1].slice(sn_idx);
-            if (!this.reverse_servers.hasOwnProperty(world_name)) {
+            if (!this.reverse_servers.has(world_name)) {
                 last_name = first_last[1];
                 world_name = null;
             }
@@ -61,8 +61,8 @@ class XIV_MapFlag {
             this.char_name_str = `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
         }
         this.map_name = map_name;
-        this.map_area = reverse_lookup[map_name];
-        this.map_info = maps[this.map_area[0]][this.map_area[1]].map_info;
+        this.map_area = reverse_lookup.get(map_name);
+        this.map_info = maps.get(this.map_area[0]).get(this.map_area[1]).map_info;
         this.coords = coords;
         this.vector_mark = null;
     }
@@ -141,7 +141,7 @@ class XIV_MapFlagCluster {
             const prox_top = this.coords[1]-this.proximity <= fc[1];
             const prox_bottom = this.coords[1]+this.proximity >= fc[1];
             if (prox_left && prox_right && prox_top && prox_bottom) {
-                this.flags[flag_to_add.toString()] = flag_to_add;
+                this.flags.set(flag_to_add.toString(), flag_to_add);
                 flag_to_add.generate_vector(this.svg_parent);
                 this.update_vector();
                 return true;
@@ -150,7 +150,7 @@ class XIV_MapFlagCluster {
             }
         } else {
             this.coords = flag_to_add.coords;
-            this.flags[flag_to_add.toString()] = flag_to_add;
+            this.flags.set(flag_to_add.toString(), flag_to_add);
             flag_to_add.generate_vector(this.svg_parent);
             this.update_vector();
             return true;
@@ -158,18 +158,18 @@ class XIV_MapFlagCluster {
     }
 
     remove_flag(flag_key_name) {
-        if (this.flags.hasOwnProperty(flag_key_name)) {
-            const flag_to_remove = this.flags[flag_key_name];
+        if (this.flags.has(flag_key_name)) {
+            const flag_to_remove = this.flags.get(flag_key_name);
             flag_to_remove.erase_vector();
-            delete this.flags[flag_key_name];
+            this.flags.remove(flag_key_name);
             this.update_vector()
         }
-        return Object.keys(this.flags).length;
+        return this.flags.size;
     }
 
     update_vector() {
         const label = [`(${this.coords[0]}, ${this.coords[1]})`];
-        for (const [k,m] of Object.entries(this.flags)) {
+        for (const m in this.flags.values()) {
             label.push(m.char_name_str);
         }
         if (this.vector_text == null) {
@@ -232,27 +232,27 @@ class XIV_MapArea {
     }
 
     add_flag(flag_to_add) {
-        if (this.flags.hasOwnProperty(flag_to_add.toString())) {
+        if (this.flags.has(flag_to_add.toString())) {
             console.log(`Refusing to add duplicate map: ${flag_to_add}`);
             return false;
         }
         for (const c of this.clusters) {
             //console.log(c);
             if (c.add_flag(flag_to_add)) {
-                this.flags[flag_to_add.toString()] = c
+                this.flags.set(flag_to_add.toString(), c);
                 return true;
             }
         }
         const new_cluster = new XIV_MapFlagCluster(this.map_info["name"], this.map_info, this.svg, this.proximity);
         new_cluster.add_flag(flag_to_add);
-        this.flags[flag_to_add.toString()] = new_cluster;
+        this.flags.set(flag_to_add.toString(), new_cluster);
         this.clusters.push(new_cluster);
         return true;
     }
 
     remove_flag(flag_to_remove) {
-        const cluster = this.flags[flag_to_remove.toString()]
-        const fc = cluster.remove_flag(flag_to_remove.toString())
+        const cluster = this.flags.get(flag_to_remove.toString());
+        const fc = cluster.remove_flag(flag_to_remove.toString());
         if (fc <= 0) {
             console.log(`Destroying empty cluster at ${cluster}`);
             cluster.erase_vector();
@@ -271,22 +271,23 @@ class XIV_FlagClusterinator {
         this.wp = null;
         this.maps = new Map();
         this.flags = new Map();
+        this.reverse_lookup = new Map();
     }
 
     add_map_area(map_area) {
-        if(this.maps.hasOwnProperty(map_area.expansion)) {
-            this.maps[map_area.expansion][map_area.map_key] = map_area;
+        if(this.maps.has(map_area.expansion)) {
+            this.maps.get(map_area.expansion).set(map_area.map_key, map_area);
         } else {
-            this.maps[map_area.expansion] = new Map();
-            this.maps[map_area.expansion][map_area.map_key] = map_area;
+            this.maps.set(map_area.expansion, new Map());
+            this.maps.get(map_area.expansion).set(map_area.map_key, map_area);
         }
-        this.reverse_lookup[map_area.map_info["name"]] = [map_area.expansion, map_area.map_key];
+        this.reverse_lookup.set(map_area.map_info["name"], [map_area.expansion, map_area.map_key]);
     }
 
     add_map_flag(map_string) {
         const map_flag = XIV_MapFlag.from_mapstr(map_string, this.wp, this.maps, this.reverse_lookup);
-        if (this.maps[map_flag.map_area[0]][map_flag.map_area[1]].add_flag(map_flag)) {
-            this.flags[map_flag.toString()] = map_flag;
+        if (this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).add_flag(map_flag)) {
+            this.flags.set(map_flag.toString(), map_flag);
             return map_flag;
         } else {
             return null;
@@ -294,14 +295,20 @@ class XIV_FlagClusterinator {
     }
 
     remove_map_flag(map_string) {
-        const map_flag = this.flags[map_string];
-        this.maps[map_flag.map_area[0]][map_flag.map_area[1]].remove_flag(map_flag);
-        delete this.flags[map_string]
+        const map_flag = this.flags.get(map_string);
+        this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).remove_flag(map_flag);
+        this.flags.remove(map_string)
     }
 
-    clear() {
-        this.maps = new Map();
-        this.reverse_lookup = new Map();
+    reset_maps() {
+        console.log("Resetting map data");
+        this.maps.clear();
+        this.reverse_lookup.clear();
+        console.log(this.flags);
+        for (const map_flag in this.flags.values()) {
+            console.log(`Reloading flag ${map_flag.toString()}`);
+            this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).add_flag(map_flag);
+        }
     }
 }
 
