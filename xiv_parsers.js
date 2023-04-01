@@ -5,7 +5,7 @@ class XIV_WorldParser {
     async init() {
         console.log(`Loading server names from ${this.server_data_file}...`)
         this.datacenter_server = await fetchJSON(this.server_data_file)
-        this.reverse_servers = {}
+        this.reverse_servers = new Map();
         for (const [datacenter, server_list] of Object.entries(this.datacenter_server)) {
             for (const server of server_list) {
                 this.reverse_servers[server] = datacenter;
@@ -53,20 +53,27 @@ class XIV_WorldParser {
 
 const map_pin_re = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w' ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
 class XIV_MapFlag {
-    constructor(map_string, world_parser, maps, reverse_lookup) {
+    constructor(char_name, map_name, coords, maps, reverse_lookup) {
+        this.char_name = char_name;
+        if (this.char_name[2] == null) {
+            this.char_name_str = `${this.char_name[0]} ${this.char_name[1]}`;
+        } else {
+            this.char_name_str = `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
+        }
+        this.map_name = map_name;
+        this.map_area = reverse_lookup[map_name];
+        this.map_info = maps[this.map_area[0]][this.map_area[1]].map_info;
+        this.coords = coords;
+        this.vector_mark = null;
+    }
+
+    static from_mapstr(map_string, world_parser, maps, reverse_lookup) {
         const match = map_string.match(map_pin_re);
         if (match) {
-            this.char_name = world_parser.parse_charname(match[1]);
-            if (this.char_name[2] == null) {
-                this.char_name_str = `${this.char_name[0]} ${this.char_name[1]}`;
-            } else {
-                this.char_name_str = `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
-            }
-            this.map_name = match[2];
-            this.map_area = reverse_lookup[match[2]];
-            this.map_info = maps[this.map_area[0]][this.map_area[1]].map_info;
-            this.coords = [parseFloat(match[3]), parseFloat(match[4])];
-            this.vector_mark = null;
+            const char_name = world_parser.parse_charname(match[1]);
+            const map_name = match[2];
+            const coords = [parseFloat(match[3]), parseFloat(match[4])];
+            return new XIV_MapFlag(char_name, map_name, coords, maps, reverse_lookup);
         } else {
             throw new XIV_ParseError("Unable to parse map string");
         }
@@ -114,7 +121,7 @@ class XIV_MapFlagCluster {
         this.map_info = map_info;
         this.proximity = proximity;
         this.coords = null;
-        this.flags = {};
+        this.flags = new Map();
         this.names_text = null;
         this.svg_parent = svg_parent;
         this.vector_text = null;
@@ -128,7 +135,7 @@ class XIV_MapFlagCluster {
         }
         if (this.coords) {
             let fc = flag_to_add.coords;
-            console.log(flag_to_add.char_name_str, fc, this.coords, this.coords[0]-this.proximity, this.coords[0]+this.proximity, "||", this.coords[1]-this.proximity, this.coords[1]+this.proximity);
+            //console.log(flag_to_add.char_name_str, fc, this.coords, this.coords[0]-this.proximity, this.coords[0]+this.proximity, "||", this.coords[1]-this.proximity, this.coords[1]+this.proximity);
             const prox_left = this.coords[0]-this.proximity <= fc[0];
             const prox_right = this.coords[0]+this.proximity >= fc[0];
             const prox_top = this.coords[1]-this.proximity <= fc[1];
@@ -220,7 +227,7 @@ class XIV_MapArea {
         this.map_info = map_info;
         this.proximity = proximity;
         this.svg = null;
-        this.flags = {};
+        this.flags = new Map();
         this.clusters = [];
     }
 
@@ -230,7 +237,7 @@ class XIV_MapArea {
             return false;
         }
         for (const c of this.clusters) {
-            console.log(c);
+            //console.log(c);
             if (c.add_flag(flag_to_add)) {
                 this.flags[flag_to_add.toString()] = c
                 return true;
@@ -262,22 +269,22 @@ class XIV_FlagClusterinator {
     constructor(map_index) {
         this.map_index = map_index;
         this.wp = null;
-        this.maps = {}
-        this.flags = {}
+        this.maps = new Map();
+        this.flags = new Map();
     }
 
     add_map_area(map_area) {
         if(this.maps.hasOwnProperty(map_area.expansion)) {
             this.maps[map_area.expansion][map_area.map_key] = map_area;
         } else {
-            this.maps[map_area.expansion] = {};
+            this.maps[map_area.expansion] = new Map();
             this.maps[map_area.expansion][map_area.map_key] = map_area;
         }
         this.reverse_lookup[map_area.map_info["name"]] = [map_area.expansion, map_area.map_key];
     }
 
     add_map_flag(map_string) {
-        const map_flag = new XIV_MapFlag(map_string, this.wp, this.maps, this.reverse_lookup);
+        const map_flag = XIV_MapFlag.from_mapstr(map_string, this.wp, this.maps, this.reverse_lookup);
         if (this.maps[map_flag.map_area[0]][map_flag.map_area[1]].add_flag(map_flag)) {
             this.flags[map_flag.toString()] = map_flag;
             return map_flag;
@@ -293,8 +300,8 @@ class XIV_FlagClusterinator {
     }
 
     clear() {
-        this.maps = {}
-        this.reverse_lookup = {}
+        this.maps = new Map();
+        this.reverse_lookup = new Map();
     }
 }
 
