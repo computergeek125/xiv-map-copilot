@@ -3,11 +3,12 @@ let settings = {
     "server_info": null,
     "light_mode": false,
 };
-let user_settings = {};
+let user_settings = new Map();
+let session_cache = new Map();
 let map_index;
 let xfc = new XIV_FlagClusterinator(map_index);
 let wp;
-const player_flag_list = {};
+const player_flag_list = new Map();
 
 async function init() {
     try {
@@ -61,6 +62,24 @@ async function init() {
     }
     if (settings["data_url"]) {
         await load_data(settings["data_url"]);
+    }
+    if (settings["session_cache"]) {
+        try {
+            const session_cache_str = sessionStorage.getItem("session_cache");
+            let session_cache;
+            if (session_cache_str) {
+                console.log("Loading session cache");
+                session_cache = JSON.parse(session_cache_str);
+                console.log(session_settings);
+            } else {
+                console.log("Session cache empty (nothing to load there)");
+            }
+            console.log(`Loaded session cache: ${session_cache}`);
+        } catch (e) {
+            console.log(`noncritical problem loading session cache: ${e} <-- if you are using this locally (as in, not on a website), this error can be ignored`);
+        }
+    } else {
+        sessionStorage.removeItem("session_cache");
     }
 }
 
@@ -315,6 +334,14 @@ function map_bulk_import() {
     input_bulk_element.value = "";
 }
 
+function map_select_move_up() {
+
+}
+
+function map_select_move_down() {
+
+}
+
 function map_remove_selected() {
     map_selector = document.getElementById("map-list-selectable");
     selected_map = map_selector.value;
@@ -332,14 +359,16 @@ function map_clear_all() {
 }
 
 function get_settings_page_json() {
-    const settings_page = {};
+    const settings_page = new Map();
     light_mode = document.documentElement.getAttribute('data-bs-theme') == 'light';
     data_url = document.getElementById("setting-preload-map-data").value;
+    session_cache = document.getElementById("setting-session-cache").checked;
 
     settings_page["light_mode"] = light_mode;
     if (data_url) {
         settings_page["data_url"] = data_url;
     }
+    settings_page["session_cache"] = session_cache;
 
     return settings_page;
 }
@@ -347,6 +376,9 @@ function get_settings_page_json() {
 function load_settings_page() {
     if (user_settings["data_url"]) {
         document.getElementById("setting-preload-map-data").value = user_settings["data_url"];
+    }
+    if (user_settings["session_cache"]) {
+        document.getElementById("setting-session-cache").checked = user_settings["session_cache"];
     }
 }
 
