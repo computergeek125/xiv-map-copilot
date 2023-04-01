@@ -367,12 +367,18 @@ function get_settings_page_data() {
     const settings_page = new Map();
     const light_mode = document.documentElement.getAttribute('data-bs-theme') == 'light';
     const data_url = document.getElementById("setting-preload-map-data").value;
+    const home_world = document.getElementById("setting-home-world").value;
+    const home_world_hide = document.getElementById("setting-home-world-hide").checked;
     const session_cache = document.getElementById("setting-session-cache").checked;
 
     settings_page.set("light_mode", light_mode);
     if (data_url) {
         settings_page.set("data_url", data_url);
     }
+    if (home_world) {
+        settings_page.set("home_world", home_world);
+    }
+    settings_page.set("home_world_hide", home_world_hide);
     settings_page.set("session_cache", session_cache);
 
     return settings_page;
@@ -381,6 +387,12 @@ function get_settings_page_data() {
 function load_settings_page() {
     if (user_settings.get("data_url")) {
         document.getElementById("setting-preload-map-data").value = user_settings.get("data_url");
+    }
+    if (user_settings.get("home_world")) {
+        document.getElementById("setting-home-world").value = user_settings.get("home_world");
+    }
+    if (user_settings.get("home_world_hide")) {
+        document.getElementById("setting-home-world-hide").checked = user_settings.get("home_world_hide");
     }
     if (user_settings.get("session_cache")) {
         document.getElementById("setting-session-cache").checked = user_settings.get("session_cache");
