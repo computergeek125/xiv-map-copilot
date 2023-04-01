@@ -171,3 +171,62 @@ function name_a_friend(chance=0.25) {
     const data = `[21:42] ${name} >The Ruby Sea ( 5.3  , 14.8 )`;
     document.getElementById("input-new-map-string").placeholder = data;
 }
+
+class Object_Cache {
+    constructor(storage_backend, storage_key) {
+        this.storage_backend = storage_backend;
+        this.storage_key = storage_key;
+        this.cache_data = new Map();
+    }
+
+    get(item_name) {
+        return this.cache_data.get(item_name);
+    }
+
+    set(item_name, value) {
+        if (settings.get("debug_cache")) {
+            console.log("Setting", item_name, "->", value);
+        }
+        this.cache_data.set(item_name, value);
+        this.write();
+    }
+
+    has(item_name) {
+        return this.cache_data.has(item_name);
+    }
+
+    load() {
+        const backend_data = this.storage_backend.getItem(this.storage_key);
+        if (settings.get("debug_cache")) {
+            console.log("Acquired backend data", backend_data);
+        }
+        if (backend_data) {
+            const cache_temp = new Map()
+            this.backend_obj = JSON.parse(backend_data);
+            for (const [k,v] of Object.entries(this.backend_obj)) {
+                if (settings.get("debug_cache")) {
+                    console.log("Reading value", k, "->", v);
+                }
+                cache_temp.set(k, v);
+            }
+            this.cache_data = cache_temp;
+        } else {
+            if (settings.get("debug_cache")) {
+                console.log("Backend map empty, starting fresh");
+            }
+            this.cache_data = new Map();
+        }
+    }
+
+    write() {
+        if (settings.get("debug_cache")) {
+            console.log("Writing", this.cache_data);
+        }
+        this.storage_backend.setItem(this.storage_key, JSON.stringify(Object.fromEntries(this.cache_data)))
+    }
+
+    erase() {
+        sessionStorage.removeItem(this.storage_key);
+        this.cache_data.clear();
+    }
+}
