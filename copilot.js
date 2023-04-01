@@ -99,7 +99,7 @@ async function load_data(url=null) {
     map_index_url = new URL("index.json", data_url)
     map_index = await fetchJSON(map_index_url);
     console.log(`Loaded map index from ${map_index_url}, resetting tabs async and building data structures`);
-    xfc.reset_maps()
+    xfc.reset_maps();
     reset_tabs_promise = resetTabs(data_url);
     if (settings.get("server_info")) {
         wp = new XIV_WorldParser(settings.get("server_info"));
@@ -131,6 +131,7 @@ async function load_data(url=null) {
             console.log(`Failed to reset tabs: ${reason}`);
         }*/
     );
+    xfc.reload_flags();
 }
 
 async function resetTabs(data_url) {
