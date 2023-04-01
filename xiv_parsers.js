@@ -1,6 +1,7 @@
 class XIV_WorldParser {
-    constructor(server_data_file) {
+    constructor(server_data_file, settings) {
         this.server_data_file = server_data_file;
+        this.settings = settings;
     }
     async init() {
         console.log(`Loading server names from ${this.server_data_file}...`)
@@ -46,6 +47,9 @@ class XIV_WorldParser {
             last_name = first_last[1];
             world_name = null;
         }
+        if (world_name == null && settings.get("home_world")) {
+            world_name = settings.get("home_world");
+        }
         //console.log(`${first_last[0]}/${last_name}/${world_name}`);
         return [first_last[0], last_name, world_name];
     }
@@ -53,18 +57,14 @@ class XIV_WorldParser {
 
 const map_pin_re = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w' ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
 class XIV_MapFlag {
-    constructor(char_name, map_name, coords, maps, reverse_lookup) {
+    constructor(char_name, map_name, coords, maps, reverse_lookup, settings) {
         this.char_name = char_name;
-        if (this.char_name[2] == null) {
-            this.char_name_str = `${this.char_name[0]} ${this.char_name[1]}`;
-        } else {
-            this.char_name_str = `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
-        }
         this.map_name = map_name;
         this.map_area = reverse_lookup.get(map_name);
         this.map_info = maps.get(this.map_area[0]).get(this.map_area[1]).map_info;
         this.coords = coords;
         this.vector_mark = null;
+        this.settings = settings;
     }
 
     static from_mapstr(map_string, world_parser, maps, reverse_lookup) {
@@ -73,19 +73,20 @@ class XIV_MapFlag {
             const char_name = world_parser.parse_charname(match[1]);
             const map_name = match[2];
             const coords = [parseFloat(match[3]), parseFloat(match[4])];
-            return new XIV_MapFlag(char_name, map_name, coords, maps, reverse_lookup);
+            return new XIV_MapFlag(char_name, map_name, coords, maps, reverse_lookup, settings);
         } else {
             throw new XIV_ParseError("Unable to parse map string");
         }
     }
 
-    static from_dict(map_dict, maps, reverse_lookup) {
+    static from_dict(map_dict, maps, reverse_lookup, settings) {
         return new XIV_MapFlag(
             map_dict.get("char_name"),
             map_dict.get("map_name"),
             map_dict.get("coords"),
             maps,
-            reverse_lookup
+            reverse_lookup,
+            settings,
         );
     }
 
@@ -94,7 +95,7 @@ class XIV_MapFlag {
     }
 
     toString() {
-        return `${this.char_name_str} --> ${this.map_name} @ (${this.coords[0]}, ${this.coords[1]})`;
+        return `${this.get_char_name_str(true)} --> ${this.map_name} @ (${this.coords[0]}, ${this.coords[1]})`;
     }
 
     to_dict() {
@@ -107,6 +108,14 @@ class XIV_MapFlag {
 
     to_json() {
         return JSON.stringify(Object.fromEntries(this.to_dict()));
+    }
+
+    get_char_name_str(full=false) {
+        if (this.char_name[2] == null || (this.settings.get("home_world_hide") && this.char_name[2] == this.settings.get("home_world") && !full)) {
+            return `${this.char_name[0]} ${this.char_name[1]}`;
+        } else {
+            return `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
+        }
     }
 
     generate_vector(svg_parent, radius=20) {
@@ -196,7 +205,7 @@ class XIV_MapFlagCluster {
     update_vector() {
         const label = [`(${this.coords[0]}, ${this.coords[1]})`];
         for (const m of this.flags.values()) {
-            label.push(m.char_name_str);
+            label.push(m.get_char_name_str());
         }
         if (this.vector_text == null) {
             const coords_rel = this.convert_coords();
@@ -288,6 +297,7 @@ class XIV_MapArea {
                 }
             }
         }
+        this.flags.delete(flag_to_remove.toString())
     }
 }
 
@@ -317,7 +327,7 @@ class XIV_FlagClusterinator {
         if (map_input instanceof XIV_MapFlag) {
             map_flag = map_input;
         } else {
-            map_flag = XIV_MapFlag.from_mapstr(map_input, this.wp, this.maps, this.reverse_lookup);
+            map_flag = XIV_MapFlag.from_mapstr(map_input, this.wp, this.maps, this.reverse_lookup, this.settings);
         }
         if (this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).add_flag(map_flag)) {
             this.flags.set(map_flag.toString(), map_flag);
@@ -333,7 +343,7 @@ class XIV_FlagClusterinator {
             let scf = this.session_cache.get("flags");
             if (scf) {
                 for (const f of Object.values(scf)) {
-                    const map_flag = XIV_MapFlag.from_dict(new Map(Object.entries(f)), this.maps, this.reverse_lookup);
+                    const map_flag = XIV_MapFlag.from_dict(new Map(Object.entries(f)), this.maps, this.reverse_lookup, this.settings);
                     this.add_map_flag(map_flag);
                 }
             }
@@ -366,15 +376,16 @@ class XIV_FlagClusterinator {
 
     remove_map_flag(map_string) {
         const map_flag = this.flags.get(map_string);
-        this.uncache_flag(map_flag);
+        this.uncache_flag(map_string);
         this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).remove_flag(map_flag);
         this.flags.delete(map_string)
     }
 
     uncache_flag(map_string) {
-        if (settings.get("session_cache")) {
+        if (this.settings.get("session_cache")) {
             const scf = this.session_cache.get("flags");
-            if (Object.hasOwnProperty(scf, map_string)) {
+            //console.log("Deleting", map_string, "from", scf);
+            if (map_string in scf) {
                 delete scf[map_string];
                 this.session_cache.set("flags", scf);
             }
