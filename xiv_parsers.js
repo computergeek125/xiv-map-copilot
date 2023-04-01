@@ -169,7 +169,7 @@ class XIV_MapFlagCluster {
 
     update_vector() {
         const label = [`(${this.coords[0]}, ${this.coords[1]})`];
-        for (const m in this.flags.values()) {
+        for (const m of this.flags.values()) {
             label.push(m.char_name_str);
         }
         if (this.vector_text == null) {
@@ -304,8 +304,10 @@ class XIV_FlagClusterinator {
         console.log("Resetting map data");
         this.maps.clear();
         this.reverse_lookup.clear();
-        console.log(this.flags);
-        for (const map_flag in this.flags.values()) {
+    }
+
+    reload_flags() {
+        for (const map_flag of this.flags.values()) {
             console.log(`Reloading flag ${map_flag.toString()}`);
             this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).add_flag(map_flag);
         }
