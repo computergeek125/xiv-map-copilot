@@ -79,8 +79,34 @@ class XIV_MapFlag {
         }
     }
 
+    static from_dict(map_dict, maps, reverse_lookup) {
+        return new XIV_MapFlag(
+            map_dict.get("char_name"),
+            map_dict.get("map_name"),
+            map_dict.get("coords"),
+            maps,
+            reverse_lookup
+        );
+    }
+
+    static from_json(map_json, maps, reverse_lookup) {
+        return XIV_MapFlag.from_dict(new Map(Object.entries(JSON.parse(map_json))), maps, reverse_lookup);
+    }
+
     toString() {
         return `${this.char_name_str} --> ${this.map_name} @ (${this.coords[0]}, ${this.coords[1]})`;
+    }
+
+    to_dict() {
+        return new Map([
+            ["char_name", this.char_name],
+            ["map_name", this.map_name],
+            ["coords", this.coords],
+        ])
+    }
+
+    to_json() {
+        return JSON.stringify(Object.fromEntries(this.to_dict()));
     }
 
     generate_vector(svg_parent, radius=20) {
@@ -161,7 +187,7 @@ class XIV_MapFlagCluster {
         if (this.flags.has(flag_key_name)) {
             const flag_to_remove = this.flags.get(flag_key_name);
             flag_to_remove.erase_vector();
-            this.flags.remove(flag_key_name);
+            this.flags.delete(flag_key_name);
             this.update_vector()
         }
         return this.flags.size;
@@ -266,8 +292,10 @@ class XIV_MapArea {
 }
 
 class XIV_FlagClusterinator {
-    constructor(map_index) {
+    constructor(map_index, settings, session_cache) {
         this.map_index = map_index;
+        this.settings = settings;
+        this.session_cache = session_cache;
         this.wp = null;
         this.maps = new Map();
         this.flags = new Map();
@@ -284,26 +312,85 @@ class XIV_FlagClusterinator {
         this.reverse_lookup.set(map_area.map_info["name"], [map_area.expansion, map_area.map_key]);
     }
 
-    add_map_flag(map_string) {
-        const map_flag = XIV_MapFlag.from_mapstr(map_string, this.wp, this.maps, this.reverse_lookup);
+    add_map_flag(map_input) {
+        let map_flag
+        if (map_input instanceof XIV_MapFlag) {
+            map_flag = map_input;
+        } else {
+            map_flag = XIV_MapFlag.from_mapstr(map_input, this.wp, this.maps, this.reverse_lookup);
+        }
         if (this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).add_flag(map_flag)) {
             this.flags.set(map_flag.toString(), map_flag);
+            this.cache_flag(map_flag);
             return map_flag;
         } else {
             return null;
         }
     }
 
+    load_cache() {
+        if (this.settings.get("session_cache")) {
+            let scf = this.session_cache.get("flags");
+            if (scf) {
+                for (const f of Object.values(scf)) {
+                    const map_flag = XIV_MapFlag.from_dict(new Map(Object.entries(f)), this.maps, this.reverse_lookup);
+                    this.add_map_flag(map_flag);
+                }
+            }
+        }
+    }
+
+    cache_flag(map_flag) {
+        if (this.settings.get("session_cache")) {
+            let scf = this.session_cache.get("flags");
+            if (!scf) {
+                scf = {};
+            }
+            scf[map_flag.toString()] = Object.fromEntries(map_flag.to_dict().entries());
+            this.session_cache.set("flags", scf);
+        }
+    }
+
+    cache_rebuild() {
+        console.log("Rebuilding cache (if enabled)");
+        this.reset_cache_flag();
+        for (const m of this.flags.values()) {
+            this.cache_flag(m);
+        }
+    }
+
+    cache_merge() {
+        this.load_cache();
+        this.cache_rebuild();
+    }
+
     remove_map_flag(map_string) {
         const map_flag = this.flags.get(map_string);
+        this.uncache_flag(map_flag);
         this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).remove_flag(map_flag);
-        this.flags.remove(map_string)
+        this.flags.delete(map_string)
+    }
+
+    uncache_flag(map_string) {
+        if (settings.get("session_cache")) {
+            const scf = this.session_cache.get("flags");
+            if (Object.hasOwnProperty(scf, map_string)) {
+                delete scf[map_string];
+                this.session_cache.set("flags", scf);
+            }
+        }
     }
 
     reset_maps() {
         console.log("Resetting map data");
         this.maps.clear();
         this.reverse_lookup.clear();
+    }
+
+    reset_cache_flag() {
+        if (settings.get("session_cache")) {
+            this.session_cache.set("flags", {});
+        }
     }
 
     reload_flags() {

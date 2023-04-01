@@ -4,9 +4,9 @@ let settings = new Map([
     ["light_mode", false],
 ]);
 let user_settings = new Map();
-let session_cache = new Map();
+const session_cache = new Object_Cache(sessionStorage, "session_cache");
 let map_index;
-let xfc = new XIV_FlagClusterinator(map_index);
+let xfc = new XIV_FlagClusterinator(map_index, settings, session_cache);
 let wp;
 const player_flag_list = new Map();
 
@@ -67,21 +67,23 @@ async function init() {
     }
     if (settings.get("session_cache")) {
         try {
-            const session_cache_str = sessionStorage.getItem("session_cache");
-            let session_cache;
-            if (session_cache_str) {
-                console.log("Loading session cache");
-                session_cache = JSON.parse(session_cache_str);
-                console.log(session_settings);
-            } else {
-                console.log("Session cache empty (nothing to load there)");
-            }
-            console.log(`Loaded session cache: ${session_cache}`);
+            console.log("Loading session cache");
+            session_cache.load();
+            console.log(session_cache.cache_data);
         } catch (e) {
-            console.log(`noncritical problem loading session cache: ${e} <-- if you are using this locally (as in, not on a website), this error can be ignored`);
+            console.log(`noncritical problem loading session cache: ${e} <-- if you are using this locally (as in, not on a website), this error might be able to be ignored`);
+        }
+        xfc.cache_merge();
+        const map_selector = document.getElementById("map-list-selectable");
+        map_selector.innerHTML = "";
+        for (const new_flag of xfc.flags.values()) {
+            const new_flag_opt = document.createElement("option");
+            new_flag_opt.text = new_flag.toString();
+            map_selector.add(new_flag_opt);
+            console.log(`Regenerated flag ${new_flag}`);
         }
     } else {
-        sessionStorage.removeItem("session_cache");
+        session_cache.erase();
     }
 }
 
@@ -363,9 +365,9 @@ function map_clear_all() {
 
 function get_settings_page_data() {
     const settings_page = new Map();
-    light_mode = document.documentElement.getAttribute('data-bs-theme') == 'light';
-    data_url = document.getElementById("setting-preload-map-data").value;
-    session_cache = document.getElementById("setting-session-cache").checked;
+    const light_mode = document.documentElement.getAttribute('data-bs-theme') == 'light';
+    const data_url = document.getElementById("setting-preload-map-data").value;
+    const session_cache = document.getElementById("setting-session-cache").checked;
 
     settings_page.set("light_mode", light_mode);
     if (data_url) {
