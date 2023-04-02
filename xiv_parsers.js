@@ -437,6 +437,7 @@ class XIV_FlagClusterinator {
     _set_nickname(char_name, nickname) {
         const char_name_str = `${char_name[0]} ${char_name[1]} @ ${char_name[2]}`;
         this.nicknames.set(char_name_str, nickname);
+        this.update_vectors();
         if (this.settings.get("session_cache")) {
             const scn = this.session_cache.get("nicknames");
             if (!scn) {
@@ -461,6 +462,7 @@ class XIV_FlagClusterinator {
     _remove_nickname(char_name) {
         const char_name_str = `${char_name[0]} ${char_name[1]} @ ${char_name[2]}`;
         this.nicknames.delete(char_name_str);
+        this.update_vectors();
         if (this.settings.get("session_cache")) {
             const scn = this.session_cache.get("nicknames");
             if (char_name_str in scn) {
@@ -476,6 +478,18 @@ class XIV_FlagClusterinator {
             this._remove_nickname(match.slice(1));
         } else {
             throw new XIV_ParseError(`Could not parse nickname string ${nickname_string}`);
+        }
+    }
+
+    update_vectors() {
+        for (const expansion of this.maps.keys()) {
+            const area_group = this.maps.get(expansion);
+            for (const map_name of area_group.keys()) {
+                const map = area_group.get(map_name);
+                for (const c of map.clusters) {
+                    c.update_vector();
+                }
+            }
         }
     }
 }
