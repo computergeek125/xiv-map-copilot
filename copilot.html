@@ -29,6 +29,7 @@
           <button class="nav-link" id="expac-tabs-shb-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-shb-content" type="button" role="tab" aria-controls="expac-tabs-shb-content" aria-selected="false">Shadowbringers</button>
           <button class="nav-link" id="expac-tabs-ew-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-ew-content" type="button" role="tab" aria-controls="expac-tabs-ew-content" aria-selected="false">Endwalker</button>
           <button class="nav-link" id="setting-tabs-maps-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-maps-content" type="button" role="tab" aria-controls="setting-tabs-maps-content" aria-selected="false" onclick="name_a_friend()">Map List</button>
+          <button class="nav-link" id="setting-tabs-nicknames-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-nicknames-content" type="button" role="tab" aria-controls="setting-tabs-nicknames-content" aria-selected="false" onclick="name_a_friend()">Nicknames</button>
           <button class="nav-link" id="setting-tabs-settings-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-settings-content" type="button" role="tab" aria-controls="setting-tabs-settings-content" aria-selected="false">Settings</button>
         </div>
         <div id="expac-tabs-content" class="col p-2 tab-content h-100 w-100" style="position: relative;">
@@ -57,6 +58,25 @@
               <div class="form-group p-2">
                 <textarea class="form-control" id="input-new-map-bulk" rows="6"></textarea>
                 <button class="btn btn-primary" type="button" onclick="map_bulk_import()">Bulk import</button>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="setting-tabs-nicknames-content" role="tabpanel" aria-labelledby="setting-tabs-nicknames-button">
+            <div class="d-flex flex-column">
+              <div class="input-group p-2">
+                <div class="input-group-prepend">
+                  <button class="btn btn-primary" type="button" onclick="nickname_add()">Add nickname</button>
+                </div>
+                <input type="text" class="form-control" id="input-new-nickname-name" placeholder="Warrior Oflight">
+                <input type="text" class="form-control" id="input-new-nickname-world" placeholder="Diablos">
+                <input type="text" class="form-control" id="input-new-nickname-nickname" placeholder="Donut Acquisition Squad">
+              </div>
+              <div class="form-group p-2">
+                <label for="nickname-list-selectable">Current nickname list:</label>
+                <select multiple class="form-control" id="nickname-list-selectable" size=10>
+                </select>
+                <button class="btn btn-warning" type="button" onclick="nickname_remove_selected()">Remove selected</button>
+                <button class="btn btn-danger" type="button" onclick="nickname_clear_all()">Clear all</button>
               </div>
             </div>
           </div>
