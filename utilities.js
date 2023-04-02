@@ -168,6 +168,7 @@ function name_a_friend(chance=0.25) {
     if (settings.get("debug_frens")) {
         console.log(applied, rname);
     }
+    document.getElementById("input-new-nickname-name").placeholder = name;
     const data = `[21:42] ${name} >The Ruby Sea ( 5.3  , 14.8 )`;
     document.getElementById("input-new-map-string").placeholder = data;
 }

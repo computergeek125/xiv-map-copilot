@@ -57,41 +57,43 @@ class XIV_WorldParser {
 
 const map_pin_re = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w' ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
 class XIV_MapFlag {
-    constructor(char_name, map_name, coords, maps, reverse_lookup, settings) {
+    constructor(char_name, map_name, coords, maps, reverse_lookup, nicknames, settings) {
         this.char_name = char_name;
         this.map_name = map_name;
         this.map_area = reverse_lookup.get(map_name);
         this.map_info = maps.get(this.map_area[0]).get(this.map_area[1]).map_info;
         this.coords = coords;
         this.vector_mark = null;
+        this.nicknames = nicknames;
         this.settings = settings;
     }
 
-    static from_mapstr(map_string, world_parser, maps, reverse_lookup) {
+    static from_mapstr(map_string, world_parser, maps, reverse_lookup, nicknames, settings) {
         const match = map_string.match(map_pin_re);
         if (match) {
             const char_name = world_parser.parse_charname(match[1]);
             const map_name = match[2];
             const coords = [parseFloat(match[3]), parseFloat(match[4])];
-            return new XIV_MapFlag(char_name, map_name, coords, maps, reverse_lookup, settings);
+            return new XIV_MapFlag(char_name, map_name, coords, maps, reverse_lookup, nicknames, settings);
         } else {
             throw new XIV_ParseError("Unable to parse map string");
         }
     }
 
-    static from_dict(map_dict, maps, reverse_lookup, settings) {
+    static from_dict(map_dict, maps, reverse_lookup, nicknames, settings) {
         return new XIV_MapFlag(
             map_dict.get("char_name"),
             map_dict.get("map_name"),
             map_dict.get("coords"),
             maps,
             reverse_lookup,
+            nicknames,
             settings,
         );
     }
 
-    static from_json(map_json, maps, reverse_lookup) {
-        return XIV_MapFlag.from_dict(new Map(Object.entries(JSON.parse(map_json))), maps, reverse_lookup);
+    static from_json(map_json, maps, reverse_lookup, nicknames, settings) {
+        return XIV_MapFlag.from_dict(new Map(Object.entries(JSON.parse(map_json))), maps, reverse_lookup, nicknames, settings);
     }
 
     toString() {
@@ -111,7 +113,14 @@ class XIV_MapFlag {
     }
 
     get_char_name_str(full=false) {
-        if (this.char_name[2] == null || (this.settings.get("home_world_hide") && this.char_name[2] == this.settings.get("home_world") && !full)) {
+        const char_fullname = `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
+        if (full) {
+            return char_fullname;
+        }
+        const nickname = this.nicknames.get(char_fullname);
+        if (nickname) {
+            return nickname;
+        } else if (this.char_name[2] == null || (this.settings.get("home_world_hide") && this.char_name[2] == this.settings.get("home_world"))) {
             return `${this.char_name[0]} ${this.char_name[1]}`;
         } else {
             return `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
@@ -301,6 +310,8 @@ class XIV_MapArea {
     }
 }
 
+const char_name_re = new RegExp(/([\w\-']+)\s+([\w\-']+)/u);
+const char_nickname_rev_re = new RegExp(/^([\w\-']+) ([\w\-']+) @ ([\w\-']+) --> ([\w\-' ]+)$/u);
 class XIV_FlagClusterinator {
     constructor(map_index, settings, session_cache) {
         this.map_index = map_index;
@@ -310,6 +321,7 @@ class XIV_FlagClusterinator {
         this.maps = new Map();
         this.flags = new Map();
         this.reverse_lookup = new Map();
+        this.nicknames = new Map();
     }
 
     add_map_area(map_area) {
@@ -327,7 +339,7 @@ class XIV_FlagClusterinator {
         if (map_input instanceof XIV_MapFlag) {
             map_flag = map_input;
         } else {
-            map_flag = XIV_MapFlag.from_mapstr(map_input, this.wp, this.maps, this.reverse_lookup, this.settings);
+            map_flag = XIV_MapFlag.from_mapstr(map_input, this.wp, this.maps, this.reverse_lookup, this.nicknames, this.settings);
         }
         if (this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).add_flag(map_flag)) {
             this.flags.set(map_flag.toString(), map_flag);
@@ -340,10 +352,18 @@ class XIV_FlagClusterinator {
 
     load_cache() {
         if (this.settings.get("session_cache")) {
+            let scn = this.session_cache.get("nicknames");
+            if (scn) {
+                for (const [c,n] of Object.entries(scn)) {
+                    if (!this.nicknames.has(c)) {
+                        this.nicknames.set(c, n);
+                    }
+                }
+            }
             let scf = this.session_cache.get("flags");
             if (scf) {
                 for (const f of Object.values(scf)) {
-                    const map_flag = XIV_MapFlag.from_dict(new Map(Object.entries(f)), this.maps, this.reverse_lookup, this.settings);
+                    const map_flag = XIV_MapFlag.from_dict(new Map(Object.entries(f)), this.maps, this.reverse_lookup, this.nicknames, this.settings);
                     this.add_map_flag(map_flag);
                 }
             }
@@ -366,6 +386,9 @@ class XIV_FlagClusterinator {
         this.reset_cache_flag();
         for (const m of this.flags.values()) {
             this.cache_flag(m);
+        }
+        if (this.settings.get("session_cache")) {
+            this.session_cache.set("nicknames", Object.fromEntries(this.nicknames.entries()));
         }
     }
 
@@ -408,6 +431,51 @@ class XIV_FlagClusterinator {
         for (const map_flag of this.flags.values()) {
             console.log(`Reloading flag ${map_flag.toString()}`);
             this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).add_flag(map_flag);
+        }
+    }
+
+    _set_nickname(char_name, nickname) {
+        const char_name_str = `${char_name[0]} ${char_name[1]} @ ${char_name[2]}`;
+        this.nicknames.set(char_name_str, nickname);
+        if (this.settings.get("session_cache")) {
+            const scn = this.session_cache.get("nicknames");
+            if (!scn) {
+                scn = {};
+            }
+            scn[char_name_str] = nickname;
+            this.session_cache.set("nicknames", scn);
+        }
+    }
+
+    set_nickname(char_string, world_name, nickname) {
+        const match = char_string.match(char_name_re);
+        if (match) {
+            const char_name = [match[1], match[2], world_name]
+            this._set_nickname(char_name, nickname);
+            return char_name;
+        } else {
+            throw new XIV_ParseError(`Could not parse character character name for [ ${char_string}, ${world_name}, ${nickname} ]`);
+        }
+    }
+
+    _remove_nickname(char_name) {
+        const char_name_str = `${char_name[0]} ${char_name[1]} @ ${char_name[2]}`;
+        this.nicknames.delete(char_name_str);
+        if (this.settings.get("session_cache")) {
+            const scn = this.session_cache.get("nicknames");
+            if (char_name_str in scn) {
+                delete scn[char_name_str];
+                this.session_cache.set("nicknames", scn);
+            }
+        }
+    }
+
+    remove_nickname(nickname_string) {
+        const match = nickname_string.match(char_nickname_rev_re);
+        if (match) {
+            this._remove_nickname(match.slice(1));
+        } else {
+            throw new XIV_ParseError(`Could not parse nickname string ${nickname_string}`);
         }
     }
 }

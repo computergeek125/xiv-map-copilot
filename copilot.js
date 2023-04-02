@@ -25,12 +25,12 @@ async function init() {
             console.log("Loading local settings");
             local_settings = new Map(Object.entries(JSON.parse(local_settings_str)));
             console.log(local_settings);
+            for (const s of local_settings.keys()) {
+                console.log(`local: setting ${s} -> ${local_settings.get(s)}`);
+                user_settings.set(s, local_settings.get(s));
+            }
         } else {
             console.log("Local settings empty (nothing to load there)");
-        }
-        for (const s of local_settings.keys()) {
-            console.log(`local: setting ${s} -> ${local_settings.get(s)}`);
-            user_settings.set(s, local_settings.get(s));
         }
     } catch (e) {
         console.log(`noncritical problem loading local settings: ${e} <-- if you are using this locally (as in, not on a website), this error might be able to be ignored`);
@@ -42,12 +42,12 @@ async function init() {
             console.log("Loading session settings");
             session_settings = new Map(Object.entries(JSON.parse(session_settings_str)));
             console.log(session_settings);
+            for (const s of session_settings.keys()) {
+                console.log(`session: setting ${s} -> ${session_settings.get(s)}`);
+                user_settings.set(s, session_settings.get(s));
+            }
         } else {
             console.log("Session settings empty (nothing to load there)");
-        }
-        for (const s of session_settings.keys()) {
-            console.log(`session: setting ${s} -> ${session_settings.get(s)}`);
-            user_settings.set(s, session_settings.get(s));
         }
     } catch (e) {
         console.log(`noncritical problem loading session settings: ${e} <-- if you are using this locally (as in, not on a website), this error might be able to be ignored`);
@@ -82,6 +82,7 @@ async function init() {
             map_selector.add(new_flag_opt);
             console.log(`Regenerated flag ${new_flag}`);
         }
+        nickname_display();
     } else {
         session_cache.erase();
     }
@@ -141,12 +142,13 @@ async function resetTabs(data_url) {
     // content template: <div class="tab-pane fade" id="expac-tabs-replaceme-content" role="tabpanel" aria-labelledby="expac-tabs-replaceme-button">ReplaceMe Data</div>
     const expac_tabs_buttons = document.getElementById('expac-tabs-buttons');
     const expac_tabs_content = document.getElementById('expac-tabs-content');
-    preserved_child_names = [
+    const preserved_child_names = [
         "setting-tabs-maps",
+        "setting-tabs-nicknames",
         "setting-tabs-settings",
     ]
-    preserved_child_tabs = [];
-    preserved_child_content = [];
+    let preserved_child_tabs = [];
+    let preserved_child_content = [];
     for (const c of preserved_child_names) {
         c_tab = document.getElementById(`${c}-button`);
         c_tab.classList.remove("active");
@@ -290,7 +292,7 @@ async function resetTabs(data_url) {
 }
 
 function _map_add_flag(map_string) {
-    map_selector = document.getElementById("map-list-selectable");
+    const map_selector = document.getElementById("map-list-selectable");
     if (map_string) {
         try {
             new_flag = xfc.add_map_flag(map_string);
@@ -324,15 +326,15 @@ function _map_remove_flag(map_string) {
 }
 
 function map_add_flag() {
-    input_map_element = document.getElementById("input-new-map-string");
-    map_string = input_map_element.value;
+    const input_map_element = document.getElementById("input-new-map-string");
+    const map_string = input_map_element.value;
     _map_add_flag(map_string);
     input_map_element.value = "";
 }
 
 function map_bulk_import() {
-    input_bulk_element = document.getElementById('input-new-map-bulk');
-    input_bulk_value = input_bulk_element.value.split("\n");
+    const input_bulk_element = document.getElementById('input-new-map-bulk');
+    const input_bulk_value = input_bulk_element.value.split("\n");
     for (const line of input_bulk_value) {
         _map_add_flag(line);
     }
@@ -348,19 +350,62 @@ function map_select_move_down() {
 }
 
 function map_remove_selected() {
-    map_selector = document.getElementById("map-list-selectable");
-    selected_map = map_selector.value;
+    const map_selector = document.getElementById("map-list-selectable");
+    const selected_map = map_selector.value;
     _map_remove_flag(selected_map);
     map_selector.remove(map_selector.selectedIndex);
 }
 
 function map_clear_all() {
-    map_selector = document.getElementById("map-list-selectable");
+    const map_selector = document.getElementById("map-list-selectable");
     for (let i=map_selector.options.length-1; i>=0; i--) {
-        selected_map = map_selector.options[i].value;
+        const selected_map = map_selector.options[i].value;
         _map_remove_flag(selected_map);
         map_selector.remove(i);
     }
+}
+
+function nickname_display() {
+    const nickname_selector = document.getElementById("nickname-list-selectable");
+    nickname_selector.innerHTML = "";
+    const index = Array.from(xfc.nicknames.keys()).sort();
+    for (const i of index) {
+        const new_nickname_opt = document.createElement("option");
+        new_nickname_opt.text = `${i} --> ${xfc.nicknames.get(i)}`;
+        nickname_selector.add(new_nickname_opt);
+    }
+}
+
+function nickname_add() {
+    const input_name_element = document.getElementById("input-new-nickname-name");
+    const input_world_element = document.getElementById("input-new-nickname-world");
+    const input_nickname_element = document.getElementById("input-new-nickname-nickname");
+    const char_string = input_name_element.value;
+    const world_name = input_world_element.value;
+    const nickname_name = input_nickname_element.value;
+    const char_name = xfc.set_nickname(char_string, world_name, nickname_name);
+    if (char_name) {
+        input_name_element.value = "";
+        input_world_element.value = "";
+        input_nickname_element.value = "";
+        nickname_display();
+    }
+}
+
+function nickname_remove_selected() {
+    const nickname_selector = document.getElementById("nickname-list-selectable");
+    const selected_nickname = nickname_selector.value;
+    xfc.remove_nickname(selected_nickname);
+    nickname_display();
+}
+
+function nickname_clear_all() {
+    const nickname_selector = document.getElementById("nickname-list-selectable");
+    for (let i=nickname_selector.options.length-1; i>=0; i--) {
+        const selected_nickname = nickname_selector.options[i].value;
+        xfc.remove_nickname(selected_nickname);
+    }
+    nickname_display();
 }
 
 function get_settings_page_data() {
