@@ -291,6 +291,22 @@ async function resetTabs(data_url) {
     expac_tabs_content.firstElementChild.classList.add("show", "active");
 }
 
+function focus_click(e, target) {
+    document.getElementById(target).focus();
+}
+
+function focus_enter(e, target) {
+    if (e.which == 13) {
+        document.getElementById(target).focus();
+    }
+}
+
+function map_keyup(e) {
+    if (e.which == 13) {
+        map_add_flag();
+    }
+}
+
 function _map_add_flag(map_string) {
     const map_selector = document.getElementById("map-list-selectable");
     if (map_string) {
@@ -362,6 +378,12 @@ function map_clear_all() {
         const selected_map = map_selector.options[i].value;
         _map_remove_flag(selected_map);
         map_selector.remove(i);
+    }
+}
+
+function nickname_keyup(e) {
+    if (e.which == 13) {
+        nickname_add();
     }
 }
 
