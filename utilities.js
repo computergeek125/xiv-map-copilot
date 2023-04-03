@@ -156,20 +156,32 @@ const frens = [
 function name_a_friend(chance=0.25) {
     let name;
     let applied;
+    let world;
+    const date = new Date();
     const rname = frens[Math.floor(Math.random() * frens.length)];
+    let rworld;
+    if (wp.reverse_servers) {
+        const wrc = Array.from(wp.reverse_servers.keys());
+        rworld = wrc[Math.floor(Math.random() * wrc.length)];
+    } else {
+        rworld = "Diabolos";
+    }
     if (Math.random() <= chance ){
         // [21:42] (Warrior Oflight) >The Ruby Sea ( 5.3  , 14.8 )
         name = rname;
+        world = rworld;
         applied = "APPLIED";
     } else {
         name = "W'arrior O'light";
+        world = "Diabolos";
         applied = "default";
     }
     if (settings.get("debug_frens")) {
         console.log(applied, rname);
     }
     document.getElementById("input-new-nickname-name").placeholder = name;
-    const data = `[21:42] ${name} >The Ruby Sea ( 5.3  , 14.8 )`;
+    document.getElementById("input-new-nickname-world").placeholder = world;
+    const data = `[${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}] ${name} >The Ruby Sea ( 5.3  , 14.8 )`;
     document.getElementById("input-new-map-string").placeholder = data;
 }
 
