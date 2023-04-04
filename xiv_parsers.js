@@ -127,10 +127,11 @@ class XIV_MapFlag {
         }
     }
 
-    generate_vector(svg_parent, radius=20) {
+    generate_vector(svg_parent) {
         if (this.vector_text != null) {
             this.erase_vector()
         }
+        const mark_size = this.settings.get("flag_mark_size");
         const coords_rel = this.convert_coords();
         const mw = svg_parent.viewBox.baseVal.width;
         const mh = svg_parent.viewBox.baseVal.height;
@@ -142,7 +143,7 @@ class XIV_MapFlag {
         }
         const pixel_x = Math.round(mw*coords_rel[0] + calibration[0]);
         const pixel_y = Math.round(mh*coords_rel[1] + calibration[1]);
-        this.vector_mark = gen_svg_cross(pixel_x, pixel_y, radius);
+        this.vector_mark = gen_svg_cross(pixel_x, pixel_y, mark_size);
         svg_parent.appendChild(this.vector_mark);
     }
 
@@ -160,9 +161,10 @@ class XIV_MapFlag {
 }
 
 class XIV_MapFlagCluster {
-    constructor(map_fullname, map_info, svg_parent, proximity) {
+    constructor(map_fullname, map_info, svg_parent, settings, proximity) {
         this.map_fullname = map_fullname;
         this.map_info = map_info;
+        this.settings = settings;
         this.proximity = proximity;
         this.coords = null;
         this.flags = new Map();
@@ -218,6 +220,7 @@ class XIV_MapFlagCluster {
         }
         if (this.vector_text == null) {
             const coords_rel = this.convert_coords();
+            const font_size = this.settings.get("flag_font_size");
             const mw = this.svg_parent.viewBox.baseVal.width;
             const mh = this.svg_parent.viewBox.baseVal.height;
             let calibration;
@@ -226,12 +229,23 @@ class XIV_MapFlagCluster {
             } else {
                 calibration = [0, 0];
             }
-            this.pixel_x = Math.round(mw*coords_rel[0] + calibration[0])+25;
-            this.pixel_y = Math.round(mh*coords_rel[1] + calibration[1])-20;
+            const pixel_mark_x = Math.round(mw*coords_rel[0] + calibration[0]);
+            const pixel_mark_y = Math.round(mh*coords_rel[1] + calibration[1]);
+            const mark_size = this.settings.get("flag_mark_size");
+            if (coords_rel[0] < 0.88 || !this.settings.get("flag_margin_overflow")) {
+                this.pixel_x = pixel_mark_x + mark_size*1.25;
+                this.pixel_y = pixel_mark_y - mark_size;
+                this.text_anchor = "start";
+            } else {
+                this.pixel_x = pixel_mark_x - mark_size*1.25;
+                this.pixel_y = pixel_mark_y - mark_size;
+                this.text_anchor = "end";
+            }
             this.vector_text = document.createElementNS("http://www.w3.org/2000/svg", "text");
             this.vector_text.setAttribute("x", this.pixel_x);
             this.vector_text.setAttribute("y", this.pixel_y);
-            this.vector_text.setAttribute("style", "font-size: 20px;")
+            this.vector_text.style.fontSize = font_size;
+            this.vector_text.setAttribute("text-anchor", this.text_anchor);
             this.svg_parent.appendChild(this.vector_text);
         }
         this.vector_text.innerHTML = "";
@@ -265,10 +279,11 @@ class XIV_MapFlagCluster {
 }
 
 class XIV_MapArea {
-    constructor(expansion, map_key, map_info, proximity=2) {
+    constructor(expansion, map_key, map_info, settings, proximity=2) {
         this.expansion = expansion;
         this.map_key = map_key;
         this.map_info = map_info;
+        this.settings = settings;
         this.proximity = proximity;
         this.svg = null;
         this.flags = new Map();
@@ -287,7 +302,7 @@ class XIV_MapArea {
                 return true;
             }
         }
-        const new_cluster = new XIV_MapFlagCluster(this.map_info["name"], this.map_info, this.svg, this.proximity);
+        const new_cluster = new XIV_MapFlagCluster(this.map_info["name"], this.map_info, this.svg, this.settings, this.proximity);
         new_cluster.add_flag(flag_to_add);
         this.flags.set(flag_to_add.toString(), new_cluster);
         this.clusters.push(new_cluster);
@@ -432,6 +447,20 @@ class XIV_FlagClusterinator {
             console.log(`Reloading flag ${map_flag.toString()}`);
             this.maps.get(map_flag.map_area[0]).get(map_flag.map_area[1]).add_flag(map_flag);
         }
+    }
+
+    switch_map_positions(idx0, idx1) {
+        if (idx0 < 0 || idx1 < 0 || idx0 >= this.flags.size || idx1 >= this.flags.size) {
+            return;
+        }
+        let temp_flags = new Map();
+        let flag_keys = Array.from(this.flags.keys());
+        console.log(`Switching ${flag_keys[idx0]} with ${flag_keys[idx1]}`);
+        [flag_keys[idx0], flag_keys[idx1]] = [flag_keys[idx1], flag_keys[idx0]];
+        for (const k of flag_keys) {
+            temp_flags.set(k, this.flags.get(k));
+        }
+        this.flags = temp_flags;
     }
 
     _set_nickname(char_name, nickname) {

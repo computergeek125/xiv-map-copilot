@@ -2,6 +2,9 @@ let settings = new Map([
     ["data_url", null],
     ["server_info", null],
     ["light_mode", false],
+    ["flag_font_size", 20],
+    ["flag_mark_size", 20],
+    ["flag_margin_overflow", false],
 ]);
 let user_settings = new Map();
 const session_cache = new Object_Cache(sessionStorage, "session_cache");
@@ -204,7 +207,7 @@ async function resetTabs(data_url) {
             const map_id = m.replaceAll("/", ":");
             //console.log(map_info);
             const map_name = map_info["name"];
-            const xma = new XIV_MapArea(e, m, map_info);
+            const xma = new XIV_MapArea(e, m, map_info, settings);
             const map_button_id =  `expac-tabs-${e_id}-map-${map_id}-tab`;
             const map_content_id = `expac-tabs-${e_id}-map-${map_id}-content`;
             // tab: <li class="nav-item" role="presentation">
@@ -307,6 +310,17 @@ function map_keyup(e) {
     }
 }
 
+function map_flag_display() {
+    const map_selector = document.getElementById("map-list-selectable");
+    map_selector.innerHTML = "";
+    const index = Array.from(xfc.flags.keys());
+    for (const i of index) {
+        const map_opt = document.createElement("option");
+        map_opt.text = `${i}`;
+        map_selector.add(map_opt);
+    }
+}
+
 function _map_add_flag(map_string) {
     const map_selector = document.getElementById("map-list-selectable");
     if (map_string) {
@@ -358,11 +372,23 @@ function map_bulk_import() {
 }
 
 function map_select_move_up() {
-
+    const map_selector = document.getElementById("map-list-selectable");
+    idx = map_selector.selectedIndex;
+    if (idx >= 0) {
+        xfc.switch_map_positions(idx, idx-1);
+        map_flag_display();
+        map_selector.selectedIndex = idx-1;
+    }
 }
 
 function map_select_move_down() {
-
+    const map_selector = document.getElementById("map-list-selectable");
+    idx = map_selector.selectedIndex;
+    if (idx >= 0) {
+        xfc.switch_map_positions(idx, idx+1);
+        map_flag_display();
+        map_selector.selectedIndex = idx+1;
+    }
 }
 
 function map_remove_selected() {
@@ -430,39 +456,79 @@ function nickname_clear_all() {
     nickname_display();
 }
 
+
+const settings_list = [
+    ["text", "setting-data-url",         "data_url"],
+    ["text", "setting-home-world",       "home_world"],
+    ["bool", "setting-home-world-hide",  "home_world_hide"],
+    ["bool", "setting-session-cache",    "session_cache"],
+    ["int",  "setting-flag-font-size",   "flag_font_size"],
+    ["int",  "setting-flag-mark-size",   "flag_mark_size"],
+    ["bool", "setting-flag-margin-over", "flag_margin_overflow"],
+]
 function get_settings_page_data() {
     const settings_page = new Map();
-    const light_mode = document.documentElement.getAttribute('data-bs-theme') == 'light';
-    const data_url = document.getElementById("setting-preload-map-data").value;
-    const home_world = document.getElementById("setting-home-world").value;
-    const home_world_hide = document.getElementById("setting-home-world-hide").checked;
-    const session_cache = document.getElementById("setting-session-cache").checked;
+    for (const s of settings_list) {
+        let value;
+        switch (s[0]) {
+            case "text":
+                value = document.getElementById(s[1]).value;
 
+                if (value == "") {
+                    value = null;
+                }
+                break;
+            case "int":
+                value = document.getElementById(s[1]).value;
+                if (value == "") {
+                    value = null;
+                } else {
+                    value = parseInt(value);
+                }
+                break;
+            case "float":
+                value = document.getElementById(s[1]).value;
+                if (value == "") {
+                    value = null;
+                } else {
+                    value = parseFloat(value);
+                }
+            case "bool":
+                value = document.getElementById(s[1]).checked;
+                break;
+            default:
+                console.error(`Unexpected setting type ${s[0]} for ${s[1]} -> ${s[2]}`);
+                value = null;
+        }
+        if (value != null) {
+            settings_page.set(s[2], value);
+        }
+    }
+    const light_mode = document.documentElement.getAttribute('data-bs-theme') == 'light';
     settings_page.set("light_mode", light_mode);
-    if (data_url) {
-        settings_page.set("data_url", data_url);
-    }
-    if (home_world) {
-        settings_page.set("home_world", home_world);
-    }
-    settings_page.set("home_world_hide", home_world_hide);
-    settings_page.set("session_cache", session_cache);
 
     return settings_page;
 }
 
 function load_settings_page() {
-    if (user_settings.get("data_url")) {
-        document.getElementById("setting-preload-map-data").value = user_settings.get("data_url");
-    }
-    if (user_settings.get("home_world")) {
-        document.getElementById("setting-home-world").value = user_settings.get("home_world");
-    }
-    if (user_settings.get("home_world_hide")) {
-        document.getElementById("setting-home-world-hide").checked = user_settings.get("home_world_hide");
-    }
-    if (user_settings.get("session_cache")) {
-        document.getElementById("setting-session-cache").checked = user_settings.get("session_cache");
+    for (const s of settings_list) {
+        switch (s[0]) {
+            case "text":
+            case "int":
+            case "float":
+                if (user_settings.get(s[2])) {
+                    document.getElementById(s[1]).value = user_settings.get(s[2]);
+                }
+                break;
+            case "bool":
+                if (user_settings.get(s[2])) {
+                    document.getElementById(s[1]).checked = user_settings.get(s[2]);
+                }
+                break;
+            default:
+                console.error(`Unexpected setting type ${s[0]} for ${s[1]} -> ${s[2]}`);
+                value = null;
+        }
     }
 }
 
