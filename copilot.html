@@ -86,14 +86,40 @@
                 <button class="btn btn-primary" onclick="jedi_sith()">Toggle dark/light mode</button>
               </div>
               <div class="form-group p-2">
-                <label for="setting-preload-map-data">Preload data pack</label>
-                <input type="text" class="form-control" id="setting-preload-map-data" aria-describedby="setting-preload-map-data-help" placeholder="https://example.com/maps/index.json">
-                <small id="setting-preload-map-data-help" class="form-text text-muted">This data pack will be preloaded at application start, instead of having to enter the field at the top every time</small>
+                <label for="setting-data-url">Preload data pack</label>
+                <input type="text" class="form-control" id="setting-data-url" aria-describedby="setting-data-url-help" placeholder="https://example.com/maps/index.json">
+                <small id="setting-data-url-help" class="form-text text-muted">This data pack will be preloaded at application start, instead of having to enter the field at the top every time</small>
               </div>
               <div class="form-group p-2">
-                <label for="setting-home-world">Home World</label>
+                <label for="setting-home-world">Home world</label>
                 <input type="text" class="form-control" id="setting-home-world" aria-describedby="setting-home-world-help" placeholder="Diablos">
                 <small id="setting-home-world-help" class="form-text text-muted">Used to parse character names from your home server under certain conditions</small>
+              </div>
+              <div class="form-group row p-2">
+                <div class="col-auto">
+                  <label class="sr-only" for="setting-flag-font-size">Flag font size</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control mb-2" id="setting-flag-font-size" placeholder="20">
+                      <div class="input-group-append">
+                      <div class="input-group-text">px</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <label class="sr-only" for="setting-flag-mark-size">Flag mark size</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control mb-2" id="setting-flag-mark-size" placeholder="20">
+                      <div class="input-group-append">
+                      <div class="input-group-text">px</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <input type="checkbox" class="form-check-input" id="setting-flag-margin-over">
+                  <label class="form-check-label" for="setting-flag-margin-over" aria-describedby="setting-flag-margin-over-help">Move margin overflow</label>
+                  <br />
+                  <small id="setting-flag-margin-over-help" class="form-text text-muted">Enabling this option will change the text anchor of flags close to the right margin</small>
+                </div>
               </div>
               <div class="form-group p-2">
                 <input type="checkbox" class="form-check-input" id="setting-home-world-hide">
@@ -103,7 +129,7 @@
               </div>
               <div class="form-group p-2">
                 <input type="checkbox" class="form-check-input" id="setting-session-cache">
-                <label class="form-check-label" for="setting-session-cache" aria-describedby="setting-session-cache-help">Enable Session Cache</label>
+                <label class="form-check-label" for="setting-session-cache" aria-describedby="setting-session-cache-help">Enable session cache</label>
                 <br />
                 <small id="setting-session-cache-help" class="form-text text-muted">Enabling this option will cache data you enter (such as map flags) to the session storage in your browser.  This preserves any data you enter against accidental refreshes.  Your browser will automatically clear this data at the end of your web session.  If this is disabled, any page refreshes will clear the aforementioned data.</small>
               </div>
