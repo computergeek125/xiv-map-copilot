@@ -544,7 +544,80 @@ function persist_settings() {
     init();
 }
 
+function _data_export() {
+    let settings_export = {};
+    settings_export["settings"] = Object.fromEntries(user_settings);
+    settings_export["user_data"] = Object.fromEntries(session_cache.cache_data);
+    return settings_export;
+}
+
+function update_settings_page(spacing=4) {
+    const de = _data_export();
+    settings_export_node = document.getElementById("settings-export-data");
+    settings_export_node.textContent = JSON.stringify(de, null, 4);
+}
+
+function _data_import(data) {
+    let settings_data;
+    if (data.hasOwnProperty("settings")) {
+        settings_data = new Map(Object.entries(data["settings"]));
+    } else {
+        settings_data = new Map();
+    }
+    const settings_page = get_settings_page_data();
+    const settings_merged = new Map([...settings_page, ...settings_data]);
+    console.log("loaded settings from import", settings_merged)
+    let user_data;
+    if (data.hasOwnProperty("user_data")) {
+        user_data = new Map(Object.entries(data["user_data"]));
+    } else {
+        user_data = new Map();
+    }
+    console.log("loaded user_data from import", user_data)
+    let flags;
+    if (user_data.has("flags")) {
+        flags = new Map(Object.entries(user_data.get("flags")));
+    } else {
+        flags = new Map();
+    }
+    for (const f of flags.values()) {
+        xfc.add_map_flag(new Map(Object.entries(f)));
+    }
+    map_flag_display();
+    let nicknames;
+    if (user_data.has("nicknames")) {
+        nicknames = new Map(Object.entries(user_data.get("nicknames")));
+    } else {
+        nicknames = new Map();
+    }
+    for (const [c,n] of nicknames.entries()) {
+        xfc.nicknames.set(c, n);
+    }
+    nickname_display();
+    const settings_object = Object.fromEntries(settings_merged.entries());
+    sessionStorage.setItem("settings", JSON.stringify(settings_object));
+    init();
+}
+
+function user_data_import() {
+    const sid = document.getElementById("settings-import-data");
+    _data_import(JSON.parse(sid.textContent));
+}
+
+async function user_data_import_file() {
+    const udif = document.getElementById("settings-import-data-file");
+    const text_data = await udif.files[0].text();
+    const sid = document.getElementById("settings-import-data");
+    sid.textContent = text_data;
+}
+
+function user_data_select_file() {
+    const udif = document.getElementById("settings-import-data-file");
+    udif.click();
+}
+
 function reset_settings() {
     localStorage.clear();
     sessionStorage.clear();
+    init();
 }
