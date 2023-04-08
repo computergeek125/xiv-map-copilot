@@ -353,6 +353,8 @@ class XIV_FlagClusterinator {
         let map_flag
         if (map_input instanceof XIV_MapFlag) {
             map_flag = map_input;
+        } else if (map_input instanceof Map) {
+            map_flag = XIV_MapFlag.from_dict(map_input, this.maps, this.reverse_lookup, this.nicknames, this.settings);
         } else {
             map_flag = XIV_MapFlag.from_mapstr(map_input, this.wp, this.maps, this.reverse_lookup, this.nicknames, this.settings);
         }

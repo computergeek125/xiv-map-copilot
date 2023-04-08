@@ -243,3 +243,15 @@ class Object_Cache {
         this.cache_data.clear();
     }
 }
+
+function download_object_as_json(export_obj, export_name, spacing=4) {
+    // modified from https://stackoverflow.com/a/30800715
+    const data_str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(export_obj, null, spacing));
+    const download_anchor_node = document.createElement('a');
+    download_anchor_node.setAttribute("href",     data_str);
+    download_anchor_node.setAttribute("download", export_name);
+    download_anchor_node.style.display = "none";
+    document.body.appendChild(download_anchor_node); // required for firefox
+    download_anchor_node.click();
+    download_anchor_node.remove();
+}

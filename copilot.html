@@ -30,7 +30,7 @@
           <button class="nav-link" id="expac-tabs-ew-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-ew-content" type="button" role="tab" aria-controls="expac-tabs-ew-content" aria-selected="false">Endwalker</button>
           <button class="nav-link" id="setting-tabs-maps-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-maps-content" type="button" role="tab" aria-controls="setting-tabs-maps-content" aria-selected="false" onclick="name_a_friend();focus_click(event,'input-new-map-string');">Map List</button>
           <button class="nav-link" id="setting-tabs-nicknames-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-nicknames-content" type="button" role="tab" aria-controls="setting-tabs-nicknames-content" aria-selected="false" onclick="name_a_friend();focus_click(event, 'input-new-nickname-name');">Nicknames</button>
-          <button class="nav-link" id="setting-tabs-settings-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-settings-content" type="button" role="tab" aria-controls="setting-tabs-settings-content" aria-selected="false">Settings</button>
+          <button class="nav-link" id="setting-tabs-settings-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-settings-content" type="button" role="tab" aria-controls="setting-tabs-settings-content" aria-selected="false" onclick="update_settings_page();">Settings</button>
         </div>
         <div id="expac-tabs-content" class="col p-2 tab-content h-100 w-100" style="position: relative;">
           <div class="tab-pane fade show active" id="expac-tabs-arr-content" role="tabpanel" aria-labelledby="expac-tabs-arr-button">A Realm Reborn Placeholder Data</div>
@@ -137,6 +137,48 @@
                 <button class="btn btn-primary" onclick="apply_settings()">Apply</button>
                 <button class="btn btn-secondary" onclick="persist_settings()">Persist</button>
                 <button class="btn btn-danger" onclick="reset_settings()">Reset</button>
+              </div>
+              <div class="accordion p-2" id="settings-advanced-data">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="settings-advanced-data-dl-head">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#settings-advanced-data-dl" aria-expanded="false" aria-controls="settings-advanced-data-dl">
+                      Export Data
+                    </button>
+                  </h2>
+                  <div id="settings-advanced-data-dl" class="accordion-collapse collapse" aria-labelledby="settings-advanced-data-dl-head" data-bs-parent="#settings-advanced-data">
+                    <div class="accordion-body">
+                      <div><button class="btn btn-outline-primary" onclick="download_object_as_json(_data_export(), 'xmc_data.json');">Download</button></div>
+                      <div class="border border-secondary mt-2 p-2"><pre><code id="settings-export-data"></code></pre></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="settings-advanced-data-ul-head">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#settings-advanced-data-ul" aria-expanded="false" aria-controls="settings-advanced-data-ul">
+                      Import Data
+                    </button>
+                  </h2>
+                  <div id="settings-advanced-data-ul" class="accordion-collapse collapse" aria-labelledby="settings-advanced-data-ul-head" data-bs-parent="#settings-advanced-data">
+                    <div class="accordion-body">
+                      <div class="form-group">
+                        <label for="settings-import-data">
+                          Input data by pasting or uploading (or typing if you're a mad cat).
+                        </label>
+                        <textarea class="form-control" id="settings-import-data" rows="15" style="font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;"></textarea>
+                        <small id="settings-import-data" class="form-text text-muted">
+                          Selecting a file below will load its contents into the text box above for your review prior to committing the changes.
+                          Clicking <kbd>Import</kbd> will merge the settings and user data shown in the above text box with the current program state.
+                          If you wish to store these settings, you will still need to click <kbd>Persist</kbd>
+                        </small>
+                      </div>
+                      <div class="mt-2">
+                        <input type="file" id="settings-import-data-file" accept="application/JSON, text/plain" style="display: none;" onchange="user_data_import_file();" />
+                        <button class="btn btn-outline-info" onclick="user_data_select_file()">Select file</button>
+                        <button class="btn btn-outline-primary" onclick="user_data_import()">Import</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
