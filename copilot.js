@@ -6,6 +6,8 @@ let settings = new Map([
     ["flag_mark_size", 20],
     ["flag_margin_overflow", false],
 ]);
+const map_pin_re_strict = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
+const map_pin_re_loose = new RegExp(/(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+) \( (\d+\.\d+) +, (\d+\.\d+) \)/u);
 let user_settings = new Map();
 const session_cache = new Object_Cache(sessionStorage, "session_cache");
 let map_index;
@@ -88,6 +90,17 @@ async function init() {
         nickname_display();
     } else {
         session_cache.erase();
+    }
+    document.getElementById("setting-parser-flag-regex-strict-regex").textContent = map_pin_re_strict;
+    document.getElementById("setting-parser-flag-regex-loose-regex").textContent = map_pin_re_loose;
+    switch (settings.get("flag_regex")) {
+        default:
+        case "strict":
+            settings.set("map_pin_re", map_pin_re_strict);
+            break;
+        case "loose":
+            settings.set("map_pin_re", map_pin_re_loose);
+            break;
     }
 }
 
@@ -465,11 +478,28 @@ const settings_list = [
     ["int",  "setting-flag-font-size",   "flag_font_size"],
     ["int",  "setting-flag-mark-size",   "flag_mark_size"],
     ["bool", "setting-flag-margin-over", "flag_margin_overflow"],
-]
+    ["radio","setting-parser-flag-regex","flag_regex"],
+];
+const settings_radios = new Map(Object.entries(
+{
+    "setting-parser-flag-regex": new Map(Object.entries({
+        "setting-parser-flag-regex-default": null,
+        "setting-parser-flag-regex-strict":  "strict",
+        "setting-parser-flag-regex-loose":   "loose",
+    })),
+}));
+const settings_radios_reverse = new Map();
+settings_radios.forEach((value, key, map) => {
+    const rev_item = new Map();
+    value.forEach((value, key, map) => {
+        rev_item.set(value, key);
+    });
+    settings_radios_reverse.set(key, rev_item);
+});
 function get_settings_page_data() {
     const settings_page = new Map();
     for (const s of settings_list) {
-        let value;
+        let value = null;
         switch (s[0]) {
             case "text":
                 value = document.getElementById(s[1]).value;
@@ -493,6 +523,16 @@ function get_settings_page_data() {
                 } else {
                     value = parseFloat(value);
                 }
+            case "radio":
+                const elements = document.getElementsByName(s[1]);
+                const radio_map = settings_radios.get(s[1]);
+                for (const e of elements) {
+                    if (e.checked) {
+                        value = radio_map.get(e.id);
+                        break;
+                    }
+                }
+                break;
             case "bool":
                 value = document.getElementById(s[1]).checked;
                 break;
@@ -518,6 +558,12 @@ function load_settings_page() {
             case "float":
                 if (user_settings.get(s[2])) {
                     document.getElementById(s[1]).value = user_settings.get(s[2]);
+                }
+                break;
+            case "radio":
+                if (user_settings.get(s[2])) {
+                    const radio_rmap = settings_radios_reverse.get(s[1]);
+                    document.getElementById(radio_rmap.get(user_settings.get(s[2]))).checked = true;
                 }
                 break;
             case "bool":

@@ -140,6 +140,45 @@
               </div>
               <div class="accordion p-2" id="settings-advanced-data">
                 <div class="accordion-item">
+                  <h2 class="accordion-header" id="settings-advanced-options-head">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#settings-advanced-options" aria-expanded="false" aria-controls="settings-advanced-options">
+                      Advanced Options
+                    </button>
+                  </h2>
+                  <div id="settings-advanced-options" class="accordion-collapse collapse" aria-labelledby="settings-advanced-options-head" data-bs-parent="#settings-advanced-data">
+                    <div class="accordion-body">
+                      <div class="form-group p-2" id="setting-parser-flag-regex-group">
+                        <label for="setting-parser-flag-regex">Flag parsing expression</label>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="setting-parser-flag-regex" id="setting-parser-flag-regex-default" checked>
+                          <label class="form-check-label" for="setting-parser-flag-regex-default">Default</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="setting-parser-flag-regex" id="setting-parser-flag-regex-strict">
+                          <label class="form-check-label" for="setting-parser-flag-regex-strict">Strict regex</label>
+                          <small class="form-text text-muted"><code id="setting-parser-flag-regex-strict-regex"></code></small>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="setting-parser-flag-regex" id="setting-parser-flag-regex-loose">
+                          <label class="form-check-label" for="setting-parser-flag-regex-loose">Loose regex</label>
+                          <small class="form-text text-muted"><code id="setting-parser-flag-regex-loose-regex"></code></small>
+                        </div>
+                        <small id="setting-parser-flag-help" class="form-text text-muted">
+                          The application uses a regular expression (RegEx) to parse data copied from the game.  This option controls how the parser will behave by selecting a particular
+                          expression that is "right" for the job.
+                          <ul>
+                            <li>Default - "Unsets" the value to use default settings</li>
+                            <li>Strict - Forces a stricter regular expression that requires the whole line of text be present (default) </li>
+                            <li>Loose - Simpler regular expression allowing for some variation at the beginning and end of the line.  May detect false data under certain circumstances.</li>
+                            <li>Custom - You choose your parse.  Only thing we requires is that the first matching group is the name, the second matching group is the map area name, 
+                                the third matching group is the x-coordinate, and the fourth matching group is the y-coordinate.</li>
+                          </ul>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
                   <h2 class="accordion-header" id="settings-advanced-data-dl-head">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#settings-advanced-data-dl" aria-expanded="false" aria-controls="settings-advanced-data-dl">
                       Export Data
@@ -165,7 +204,7 @@
                           Input data by pasting or uploading (or typing if you're a mad cat).
                         </label>
                         <textarea class="form-control" id="settings-import-data" rows="15" style="font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;"></textarea>
-                        <small id="settings-import-data" class="form-text text-muted">
+                        <small id="settings-import-data-help" class="form-text text-muted">
                           Selecting a file below will load its contents into the text box above for your review prior to committing the changes.
                           Clicking <kbd>Import</kbd> will merge the settings and user data shown in the above text box with the current program state.
                           If you wish to store these settings, you will still need to click <kbd>Persist</kbd>

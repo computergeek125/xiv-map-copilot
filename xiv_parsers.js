@@ -55,7 +55,6 @@ class XIV_WorldParser {
     }
 }
 
-const map_pin_re = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w' ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
 class XIV_MapFlag {
     constructor(char_name, map_name, coords, maps, reverse_lookup, nicknames, settings) {
         this.char_name = char_name;
@@ -69,7 +68,8 @@ class XIV_MapFlag {
     }
 
     static from_mapstr(map_string, world_parser, maps, reverse_lookup, nicknames, settings) {
-        const match = map_string.match(map_pin_re);
+        const match = map_string.match(settings.get("map_pin_re"));
+        console.log("re_match", settings.get("map_pin_re"), match);
         if (match) {
             const char_name = world_parser.parse_charname(match[1]);
             const map_name = match[2];
