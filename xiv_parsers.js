@@ -69,7 +69,9 @@ class XIV_MapFlag {
 
     static from_mapstr(map_string, world_parser, maps, reverse_lookup, nicknames, settings) {
         const match = map_string.match(settings.get("map_pin_re"));
-        console.log("re_match", settings.get("map_pin_re"), match);
+        if (settings.get("debug_map_flag_re")) {
+            console.log("re_match", settings.get("map_pin_re"), match);
+        }
         if (match) {
             const char_name = world_parser.parse_charname(match[1]);
             const map_name = match[2];
@@ -113,7 +115,7 @@ class XIV_MapFlag {
     }
 
     get_char_name_str(full=false) {
-        const char_fullname = `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
+        const char_fullname = `${this.char_name[0]} ${this.char_name[1]} \u{1f338} ${this.char_name[2]}`;
         if (full) {
             return char_fullname;
         }
@@ -123,7 +125,7 @@ class XIV_MapFlag {
         } else if (this.char_name[2] == null || (this.settings.get("home_world_hide") && this.char_name[2] == this.settings.get("home_world"))) {
             return `${this.char_name[0]} ${this.char_name[1]}`;
         } else {
-            return `${this.char_name[0]} ${this.char_name[1]} @ ${this.char_name[2]}`;
+            return char_fullname;
         }
     }
 
