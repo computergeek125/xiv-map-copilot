@@ -198,7 +198,7 @@ class Object_Cache {
 
     set(item_name, value) {
         if (settings.get("debug_cache")) {
-            console.log("Setting", item_name, "->", value);
+            console.log("CACHE: Setting", item_name, "->", value);
         }
         this.cache_data.set(item_name, value);
         this.write();
@@ -211,21 +211,24 @@ class Object_Cache {
     load() {
         const backend_data = this.storage_backend.getItem(this.storage_key);
         if (settings.get("debug_cache")) {
-            console.log("Acquired backend data", backend_data);
+            console.log("CACHE: Acquired backend data", backend_data);
         }
         if (backend_data) {
             const cache_temp = new Map()
             this.backend_obj = JSON.parse(backend_data);
             for (const [k,v] of Object.entries(this.backend_obj)) {
                 if (settings.get("debug_cache")) {
-                    console.log("Reading value", k, "->", v);
+                    console.log("CACHE: Reading value", k, "->", v);
                 }
                 cache_temp.set(k, v);
+            }
+            if (settings.get("debug_cache")) {
+                console.log("CACHE: Final cache_temp is", cache_temp);
             }
             this.cache_data = cache_temp;
         } else {
             if (settings.get("debug_cache")) {
-                console.log("Backend map empty, starting fresh");
+                console.log("CACHE: Backend map empty, starting fresh");
             }
             this.cache_data = new Map();
         }
@@ -233,7 +236,7 @@ class Object_Cache {
 
     write() {
         if (settings.get("debug_cache")) {
-            console.log("Writing", this.cache_data);
+            console.log("CACHE: Writing", this.cache_data);
         }
         this.storage_backend.setItem(this.storage_key, JSON.stringify(Object.fromEntries(this.cache_data)))
     }
