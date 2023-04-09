@@ -6,6 +6,9 @@ let settings = new Map([
     ["flag_mark_size", 20],
     ["flag_margin_overflow", false],
 ]);
+let sticky_settings = [
+    "debug_",
+];
 const map_pin_re_strict = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
 const map_pin_re_loose = new RegExp(/(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+) \( (\d+\.\d+) +, (\d+\.\d+) \)/u);
 let user_settings = new Map();
@@ -429,10 +432,11 @@ function nickname_keyup(e) {
 function nickname_display() {
     const nickname_selector = document.getElementById("nickname-list-selectable");
     nickname_selector.innerHTML = "";
-    const index = Array.from(xfc.nicknames.keys()).sort();
+    const index = xfc.nicknames.sorted_by_char_name();
     for (const i of index) {
         const new_nickname_opt = document.createElement("option");
-        new_nickname_opt.text = `${i} --> ${xfc.nicknames.get(i)}`;
+        new_nickname_opt.text = `${i} --> ${xfc.nicknames.get_nickname(i)}`;
+        new_nickname_opt.setAttribute("nickname_hash", i);
         nickname_selector.add(new_nickname_opt);
     }
 }
@@ -455,8 +459,9 @@ function nickname_add() {
 
 function nickname_remove_selected() {
     const nickname_selector = document.getElementById("nickname-list-selectable");
-    const selected_nickname = nickname_selector.value;
-    xfc.remove_nickname(selected_nickname);
+    const selected_nickname = nickname_selector.selectedIndex;
+    const nickname_hash = nickname_selector.children[selected_nickname].getAttribute("nickname_hash");
+    xfc.remove_nickname(nickname_hash);
     nickname_display();
 }
 
@@ -578,15 +583,29 @@ function load_settings_page() {
     }
 }
 
+function get_settings_data() {
+    const settings_data = get_settings_page_data();
+    for (const s of sticky_settings) {
+        for (const [k,v] of settings.entries()) {
+            console.log(s,k,v);
+            if (k.startsWith(s)) {
+                settings_data.set(k, v);
+            }
+        }
+    }
+    console.log(settings_data);
+    return settings_data;
+}
+
 function apply_settings() {
-    const settings_page = Object.fromEntries(get_settings_page_data());
-    sessionStorage.setItem("settings", JSON.stringify(settings_page));
+    const settings_data = Object.fromEntries(get_settings_data());
+    sessionStorage.setItem("settings", JSON.stringify(settings_data));
     init();
 }
 
 function persist_settings() {
-    const settings_page = Object.fromEntries(get_settings_page_data());
-    localStorage.setItem("settings", JSON.stringify(settings_page));
+    const settings_data = Object.fromEntries(get_settings_data());
+    localStorage.setItem("settings", JSON.stringify(settings_data));
     init();
 }
 
@@ -610,8 +629,8 @@ function _data_import(data) {
     } else {
         settings_data = new Map();
     }
-    const settings_page = get_settings_page_data();
-    const settings_merged = new Map([...settings_page, ...settings_data]);
+    const settings_existing = get_settings_data();
+    const settings_merged = new Map([...settings_existing, ...settings_data]);
     console.log("loaded settings from import", settings_merged)
     let user_data;
     if (data.hasOwnProperty("user_data")) {
@@ -637,7 +656,7 @@ function _data_import(data) {
         nicknames = new Map();
     }
     for (const [c,n] of nicknames.entries()) {
-        xfc.nicknames.set(c, n);
+        xfc.nicknames.cache_import_name(c, n);
     }
     nickname_display();
     const settings_object = Object.fromEntries(settings_merged.entries());
