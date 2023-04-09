@@ -342,7 +342,7 @@ class XIV_NickNameinator {
 
     cache_import_name(k,v) {
         if (Array.isArray(v)) {
-            console.log("nns", v.slice(0,3), v.slice(3,4));
+            //console.log("nns", v.slice(0,3), v.slice(3,4));
             this._set_nickname(v.slice(0,3), v.slice(3,4)[0]);
         } else {
             const char_world = k.split(" @ ");
@@ -351,13 +351,13 @@ class XIV_NickNameinator {
     }
 
     cache_load() {
-        console.log("ncs", this.settings);
+        //console.log("ncs", this.settings);
         if (this.settings.get("session_cache")) {
             const nickname_cache = this.session_cache.get("nicknames");
             if (nickname_cache) {
-                console.log(nickname_cache);
+                //console.log(nickname_cache);
                 for (const [k,v] of Object.entries(nickname_cache)) {
-                    console.log('name ->', k, v);
+                    //console.log('name ->', k, v);
                     this.cache_import_name(k,v)
                 }
             }

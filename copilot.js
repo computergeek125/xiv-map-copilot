@@ -601,13 +601,11 @@ function get_settings_data() {
     const settings_data = get_settings_page_data();
     for (const s of sticky_settings) {
         for (const [k,v] of settings.entries()) {
-            console.log(s,k,v);
             if (k.startsWith(s)) {
                 settings_data.set(k, v);
             }
         }
     }
-    console.log(settings_data);
     return settings_data;
 }
 
