@@ -441,6 +441,7 @@ class XIV_NickNameinator {
                 this.session_cache.set("nicknames", scn);
             }
         }
+        return name_array;
     }
 
     remove_nickname_char_name(char_name) {
@@ -450,12 +451,12 @@ class XIV_NickNameinator {
         } else {
             char_name_str = XIV_NickNameinator.hash_char_name(char_name);
         }
-        this._remove_nickname(char_name_str);
+        return this._remove_nickname(char_name_str);
     }
 
     remove_nickname_nickname(nickname) {
         char_name_str = this.reverse_lookup.get(nickname);
-        this._remove_nickname(char_name_str);
+        return this._remove_nickname(char_name_str);
     }
 }
 
@@ -597,8 +598,9 @@ class XIV_FlagClusterinator {
     }
 
     remove_nickname(char_name_str) {
-        this.nicknames.remove_nickname_char_name(char_name_str);
+        const name_array = this.nicknames.remove_nickname_char_name(char_name_str);
         this.update_vectors();
+        return name_array;
     }
 
     update_vectors() {
