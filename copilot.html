@@ -42,7 +42,7 @@
             <div class="d-flex flex-column">
               <div class="input-group p-2">
                 <div class="input-group-prepend">
-                  <button class="btn btn-primary" type="button" onclick="map_add_flag()">Add map</button>
+                  <button class="btn btn-outline-success" type="button" onclick="map_add_flag()">Add map</button>
                 </div>
                 <input type="text" class="form-control" id="input-new-map-string" onkeyup="map_keyup(event);" placeholder="[21:42] (Warrior Oflight) >The Ruby Sea ( 5.3  , 14.8 )">
               </div>
@@ -52,8 +52,8 @@
                 </select>
                 <button class="btn btn-outline-info" type="button" onclick="map_select_move_up()">Move Up</button>
                 <button class="btn btn-outline-info" type="button" onclick="map_select_move_down()">Move Down</button>
-                <button class="btn btn-warning" type="button" onclick="map_remove_selected()">Remove selected</button>
-                <button class="btn btn-danger" type="button" onclick="map_clear_all()">Clear all</button>
+                <button class="btn btn-outline-warning" type="button" onclick="map_remove_selected()">Remove selected</button>
+                <button class="btn btn-outline-danger" type="button" onclick="map_clear_all()">Clear all</button>
               </div>
               <div class="form-group p-2">
                 <textarea class="form-control" id="input-new-map-bulk" rows="6"></textarea>
@@ -65,7 +65,7 @@
             <div class="d-flex flex-column">
               <div class="input-group p-2">
                 <div class="input-group-prepend">
-                  <button class="btn btn-primary" type="button" onclick="nickname_add()">Add nickname</button>
+                  <button class="btn btn-outline-success" type="button" onclick="nickname_add()">Add nickname</button>
                 </div>
                 <input type="text" class="form-control" id="input-new-nickname-name" onkeyup="focus_enter(event,'input-new-nickname-world');" placeholder="Warrior Oflight">
                 <input type="text" class="form-control" id="input-new-nickname-world" onkeyup="focus_enter(event,'input-new-nickname-nickname');" placeholder="Diabolos">
@@ -75,8 +75,9 @@
                 <label for="nickname-list-selectable">Current nickname list:</label>
                 <select multiple class="form-control" id="nickname-list-selectable" size=10>
                 </select>
-                <button class="btn btn-warning" type="button" onclick="nickname_remove_selected()">Remove selected</button>
-                <button class="btn btn-danger" type="button" onclick="nickname_clear_all()">Clear all</button>
+                <button class="btn btn-outline-info" type="button" onclick="nickname_edit_selected()">Edit Nickname</button>
+                <button class="btn btn-outline-warning" type="button" onclick="nickname_remove_selected()">Remove selected</button>
+                <button class="btn btn-outline-danger" type="button" onclick="nickname_clear_all()">Clear all</button>
               </div>
             </div>
           </div>

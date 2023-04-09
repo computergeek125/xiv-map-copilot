@@ -457,6 +457,20 @@ function nickname_add() {
     }
 }
 
+function nickname_edit_selected() {
+    const input_name_element = document.getElementById("input-new-nickname-name");
+    const input_world_element = document.getElementById("input-new-nickname-world");
+    const input_nickname_element = document.getElementById("input-new-nickname-nickname");
+    const nickname_selector = document.getElementById("nickname-list-selectable");
+    const selected_nickname = nickname_selector.selectedIndex;
+    const nickname_hash = nickname_selector.children[selected_nickname].getAttribute("nickname_hash");
+    const name_array = xfc.remove_nickname(nickname_hash);
+    input_name_element.value = `${name_array[0]} ${name_array[1]}`;
+    input_world_element.value = name_array[2];
+    input_nickname_element.value = name_array[3];
+    nickname_display();
+}
+
 function nickname_remove_selected() {
     const nickname_selector = document.getElementById("nickname-list-selectable");
     const selected_nickname = nickname_selector.selectedIndex;
