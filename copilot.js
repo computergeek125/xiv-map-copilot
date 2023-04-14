@@ -388,6 +388,17 @@ function map_bulk_import() {
     input_bulk_element.value = "";
 }
 
+function map_select_jump() {
+    const map_selector = document.getElementById("map-list-selectable");
+    if (map_selector.selectedOptions.length > 0) {
+        flag = xfc.flags.get(map_selector.selectedOptions[0].value);
+        const expac_tab = `expac-tabs-${flag.map_area[0]}`;
+        const map_rname = flag.map_area[1].replaceAll("/", ":");
+        const map_tab = `expac-tabs-${flag.map_area[0]}-map-${map_rname}`;
+        set_active(expac_tab, map_tab);
+    }
+}
+
 function map_select_move_up() {
     const map_selector = document.getElementById("map-list-selectable");
     idx = map_selector.selectedIndex;
