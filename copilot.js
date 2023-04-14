@@ -18,7 +18,7 @@ let xfc = new XIV_FlagClusterinator(map_index, settings, session_cache);
 let wp;
 const player_flag_list = new Map();
 
-async function init() {
+async function init(return_tab=null, return_map=null) {
     try {
         for (const s in settings_preload) {
             settings.set(s, settings_preload[s]);
@@ -105,6 +105,7 @@ async function init() {
             settings.set("map_pin_re", map_pin_re_loose);
             break;
     }
+    set_active(return_tab, return_map);
 }
 
 async function load_data(url=null) {
@@ -615,13 +616,13 @@ function get_settings_data() {
 function apply_settings() {
     const settings_data = Object.fromEntries(get_settings_data());
     sessionStorage.setItem("settings", JSON.stringify(settings_data));
-    init();
+    init("setting-tabs-settings");
 }
 
 function persist_settings() {
     const settings_data = Object.fromEntries(get_settings_data());
     localStorage.setItem("settings", JSON.stringify(settings_data));
-    init();
+    init("setting-tabs-settings");
 }
 
 function _data_export() {
@@ -676,12 +677,13 @@ function _data_import(data) {
     nickname_display();
     const settings_object = Object.fromEntries(settings_merged.entries());
     sessionStorage.setItem("settings", JSON.stringify(settings_object));
-    init();
+    init("setting-tabs-settings");
 }
 
 function user_data_import() {
     const sid = document.getElementById("settings-import-data");
     _data_import(JSON.parse(sid.textContent));
+    sid.textContent = "";
 }
 
 async function user_data_import_file() {
@@ -699,5 +701,5 @@ function user_data_select_file() {
 function reset_settings() {
     localStorage.clear();
     sessionStorage.clear();
-    init();
+    init("setting-tabs-settings");
 }

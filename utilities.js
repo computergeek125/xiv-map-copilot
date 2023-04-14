@@ -79,6 +79,17 @@ function jedi_sith() {
     }
 }
 
+function set_active(tab, map) {
+    tab_elem = document.getElementById(`${tab}-button`);
+    map_elem = document.getElementById(`${map}-tab`);
+    if (tab_elem) {
+        tab_elem.click();
+    }
+    if (map_elem) {
+        map_elem.click();
+    }
+}
+
 const frens = [
     "Alka Zolka",
     "Alianne Vellegrance",
