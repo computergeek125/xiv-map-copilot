@@ -409,9 +409,11 @@ function map_select_move_down() {
 
 function map_remove_selected() {
     const map_selector = document.getElementById("map-list-selectable");
-    const selected_map = map_selector.value;
-    _map_remove_flag(selected_map);
-    map_selector.remove(map_selector.selectedIndex);
+    for (const selected_map of map_selector.selectedOptions) {
+        console.log("Found selection", selected_map);
+        _map_remove_flag(selected_map.value);
+    }
+    map_flag_display();
 }
 
 function map_clear_all() {
@@ -473,9 +475,10 @@ function nickname_edit_selected() {
 
 function nickname_remove_selected() {
     const nickname_selector = document.getElementById("nickname-list-selectable");
-    const selected_nickname = nickname_selector.selectedIndex;
-    const nickname_hash = nickname_selector.children[selected_nickname].getAttribute("nickname_hash");
-    xfc.remove_nickname(nickname_hash);
+    for (const selected_option of nickname_selector.selectedOptions) {
+        const nickname_hash = selected_option.getAttribute("nickname_hash");
+        xfc.remove_nickname(nickname_hash);
+    }
     nickname_display();
 }
 
