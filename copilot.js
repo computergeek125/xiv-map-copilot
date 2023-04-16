@@ -6,9 +6,7 @@ let settings = new Map([
     ["flag_mark_size", 20],
     ["flag_margin_overflow", false],
 ]);
-let sticky_settings = [
-    "debug_",
-];
+let settings_debug = new Map();
 const map_pin_re_strict = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
 const map_pin_re_loose = new RegExp(/(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+) \( (\d+\.\d+) +, (\d+\.\d+) \)/u);
 let user_settings = new Map();
@@ -191,7 +189,6 @@ async function resetTabs(data_url) {
         const e_button = document.createElement('button');
         e_button.setAttribute(            "id", e_button_id);
         e_button.setAttribute(         "class", "nav-link");
-        //e_button.setAttribute( "data-bs-theme", "dark");
         e_button.setAttribute("data-bs-toggle", "pill");
         e_button.setAttribute("data-bs-target", `#${e_content_id}`);
         e_button.setAttribute(          "type", "button");
@@ -209,87 +206,77 @@ async function resetTabs(data_url) {
         // tabstrip: <ul class="nav nav-tabs" id="myTab" role="tablist">
         e_tabstrip.setAttribute(        "class", "nav nav-tabs");
         e_tabstrip.setAttribute(           "id", `expac-tabs-${e_id}-tabstrip`);
-        //e_tabstrip.setAttribute("data-bs-theme", "dark");
         e_tabstrip.setAttribute(         "role", "tablist");
         // tab content: <div class="tab-content" id="myTabContent">
         const e_tabcontent = document.createElement("div");
         e_tabcontent.setAttribute(        "class", "tab-content h-100 w-100");
         e_tabcontent.setAttribute(           "id", `expac-tabs-${e_id}-tabcontent`);
-        //e_tabcontent.setAttribute("data-bs-theme", "dark");
         e_tabcontent.setAttribute(        "style", "position: relative;");
         for (let mx=0; mx<map_index['expansions'][e]["maps"].length; mx++) {
             m = map_index['expansions'][e]["maps"][mx]
             console.log(`Loading map ${m}...`)
             const map_info = map_index["map_info"][m];
-            const map_id = m.replaceAll("/", ":");
-            //console.log(map_info);
-            const map_name = map_info["name"];
-            const xma = new XIV_MapArea(e, m, map_info, settings);
-            const map_button_id =  `expac-tabs-${e_id}-map-${map_id}-tab`;
-            const map_content_id = `expac-tabs-${e_id}-map-${map_id}-content`;
-            // tab: <li class="nav-item" role="presentation">
-            //        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Home</button>
-            //      </li>
-            const map_tab_li = document.createElement("li")
-            map_tab_li.setAttribute("class", "nav-item");
-            map_tab_li.setAttribute( "role", "presentation");
-            const map_tab_btn = document.createElement("button");
-            map_tab_btn.setAttribute(        "class", "nav-link");
-            map_tab_btn.setAttribute(           "id", map_button_id);
-            map_tab_btn.setAttribute("data-bs-toggle", "tab");
-            map_tab_btn.setAttribute("data-bs-target", `#${map_content_id}`);
-            map_tab_btn.setAttribute(          "type", "button");
-            map_tab_btn.setAttribute(          "role", "tab");
-            map_tab_btn.setAttribute( "aria-controls", map_content_id);
-            map_tab_btn.setAttribute( "aria-selected", false);
-            //map_tab_btn.addEventListener("click", click_test);
-            map_tab_btn.innerText = map_name
-            map_tab_li.appendChild(map_tab_btn);
-            // tab content: <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">...</div>
-            const map_content = document.createElement("div");
-            map_content.setAttribute(          "class", "tab-pane fade h-100 w-100");
-            map_content.setAttribute(             "id", map_content_id);
-            map_content.setAttribute(           "role", "tabpanel");
-            map_content.setAttribute("aria-labelledby", map_button_id);
-            map_content.setAttribute(          "style", "position: relative;");
-            map_content.setAttribute(       "tabindex", 0);
+            console.log(map_info["name"], map_info["hidden_map"], settings.get("show_all_maps"))
+            if (!map_info["hidden_map"] || settings.get("show_all_maps")) {
+                const map_id = m.replaceAll("/", ":");
+                //console.log(map_info);
+                const map_name = map_info["name"];
+                const xma = new XIV_MapArea(e, m, map_info, settings);
+                const map_button_id =  `expac-tabs-${e_id}-map-${map_id}-tab`;
+                const map_content_id = `expac-tabs-${e_id}-map-${map_id}-content`;
+                // tab: <li class="nav-item" role="presentation">
+                //        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Home</button>
+                //      </li>
+                const map_tab_li = document.createElement("li")
+                map_tab_li.setAttribute("class", "nav-item");
+                map_tab_li.setAttribute( "role", "presentation");
+                const map_tab_btn = document.createElement("button");
+                map_tab_btn.setAttribute(        "class", "nav-link");
+                map_tab_btn.setAttribute(           "id", map_button_id);
+                map_tab_btn.setAttribute("data-bs-toggle", "tab");
+                map_tab_btn.setAttribute("data-bs-target", `#${map_content_id}`);
+                map_tab_btn.setAttribute(          "type", "button");
+                map_tab_btn.setAttribute(          "role", "tab");
+                map_tab_btn.setAttribute( "aria-controls", map_content_id);
+                map_tab_btn.setAttribute( "aria-selected", false);
+                map_tab_btn.innerText = map_name
+                map_tab_li.appendChild(map_tab_btn);
+                // tab content: <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">...</div>
+                const map_content = document.createElement("div");
+                map_content.setAttribute(          "class", "tab-pane fade h-100 w-100");
+                map_content.setAttribute(             "id", map_content_id);
+                map_content.setAttribute(           "role", "tabpanel");
+                map_content.setAttribute("aria-labelledby", map_button_id);
+                map_content.setAttribute(          "style", "position: relative;");
+                map_content.setAttribute(       "tabindex", 0);
 
-            const map_img_id = `map-${e_id}-${map_id}-image`;
-            //const map_svg_id = `map-${e_id}-${map_id}-canvas`;
-            const map_svg_id = `map-${e_id}-${map_id}-image-overlay`;
-            const map_img_relpath = `${e}/${m}/${map_info["filename"]}`;
-            const map_img_url = new URL(map_img_relpath, img_url_base);
-            //console.log(`${map_img_relpath} | ${map_img_url}`);
-            const map_img = document.createElement("img");
-            map_img.setAttribute(   "id", map_img_id);
-            map_img.setAttribute("class", "img-fluid mh-100 mw-100");
-            map_img.setAttribute("style", "position: absolute;");
-            map_img.setAttribute(  "src", map_img_url);
-            map_img.addEventListener("load", img_resize_svg)
+                const map_img_id = `map-${e_id}-${map_id}-image`;
+                const map_svg_id = `map-${e_id}-${map_id}-image-overlay`;
+                const map_img_relpath = `${e}/${m}/${map_info["filename"]}`;
+                const map_img_url = new URL(map_img_relpath, img_url_base);
+                //console.log(`${map_img_relpath} | ${map_img_url}`);
+                const map_img = document.createElement("img");
+                map_img.setAttribute(   "id", map_img_id);
+                map_img.setAttribute("class", "img-fluid mh-100 mw-100");
+                map_img.setAttribute("style", "position: absolute;");
+                map_img.setAttribute(  "src", map_img_url);
+                map_img.addEventListener("load", img_resize_svg)
 
-            const map_svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            map_svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
-            map_svg.setAttribute(   "id", map_svg_id);
-            map_svg.setAttribute("class", "img-fluid mh-100 mw-100");
-            map_svg.setAttribute("style", "position: absolute");
-            map_svg.setAttribute("viewBox", `0 0 1177 1177`);
-            xma.svg = map_svg;
+                const map_svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                map_svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
+                map_svg.setAttribute(   "id", map_svg_id);
+                map_svg.setAttribute("class", "img-fluid mh-100 mw-100");
+                map_svg.setAttribute("style", "position: absolute");
+                map_svg.setAttribute("viewBox", `0 0 1177 1177`);
+                xma.svg = map_svg;
 
-            //test_cross = gen_svg_cross(100, 100, 50);
-            //map_svg.appendChild(test_cross);
+                map_content.appendChild(map_img);
+                map_content.appendChild(map_svg);
+                e_tabstrip.appendChild(map_tab_li);
+                e_tabcontent.appendChild(map_content);
 
-            //const map_image = document.createElementNS("http://www.w3.org/2000/svg", "image");
-            //map_image.setAttribute(  "id", map_img_id);
-            //map_image.setAttribute("href", map_img_url);
-            
-            //map_svg.appendChild(map_image);
-
-            map_content.appendChild(map_img);
-            map_content.appendChild(map_svg);
-            e_tabstrip.appendChild(map_tab_li);
-            e_tabcontent.appendChild(map_content);
-
-            xfc.add_map_area(xma);
+                xfc.add_map_area(xma);
+            }
         }
         e_tabstrip.firstElementChild.firstElementChild.classList.add("active");
         e_tabstrip.firstElementChild.setAttribute("aria-selected", true);
@@ -512,6 +499,7 @@ const settings_list = [
     ["int",  "setting-flag-font-size",   "flag_font_size"],
     ["int",  "setting-flag-mark-size",   "flag_mark_size"],
     ["bool", "setting-flag-margin-over", "flag_margin_overflow"],
+    ["bool", "setting-show-all-maps",    "show_all_maps"],
     ["radio","setting-parser-flag-regex","flag_regex"],
 ];
 const settings_radios = new Map(Object.entries(
@@ -614,14 +602,7 @@ function load_settings_page() {
 
 function get_settings_data() {
     const settings_data = get_settings_page_data();
-    for (const s of sticky_settings) {
-        for (const [k,v] of settings.entries()) {
-            if (k.startsWith(s)) {
-                settings_data.set(k, v);
-            }
-        }
-    }
-    return settings_data;
+    return new Map([...settings_data, ...settings_debug]);
 }
 
 function apply_settings() {
