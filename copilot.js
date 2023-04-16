@@ -216,7 +216,6 @@ async function resetTabs(data_url) {
             m = map_index['expansions'][e]["maps"][mx]
             console.log(`Loading map ${m}...`)
             const map_info = map_index["map_info"][m];
-            console.log(map_info["name"], map_info["hidden_map"], settings.get("show_all_maps"))
             if (!map_info["hidden_map"] || settings.get("show_all_maps")) {
                 const map_id = m.replaceAll("/", ":");
                 //console.log(map_info);
