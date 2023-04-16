@@ -164,7 +164,7 @@ const frens = [
     "Yda Hext",
     ]
 const default_nicknames = [
-    "Donut Acquisition Squad",
+    "Sandwich Acquisition Ninja",
     "Lucky Treasure Hunter",
     "Raider of Raids",
     "Immortal Resurrector",
@@ -181,12 +181,13 @@ function name_a_friend(chance=0.25) {
     const rnickname = default_nicknames[Math.floor(Math.random() * default_nicknames.length)];
     let rworld;
     if (settings.get("home_world")) {
-        rworld = settings.get("home_world");
-    } else if (wp.reverse_servers) {
+        hworld = settings.get("home_world");
+    } else {
+        hworld = "World Name";
+    }
+    if (wp.reverse_servers) {
         const wrc = Array.from(wp.reverse_servers.keys());
         rworld = wrc[Math.floor(Math.random() * wrc.length)];
-    } else {
-        rworld = "Diabolos";
     }
     if (Math.random() <= chance ){
         // [21:42] (Warrior Oflight) >The Ruby Sea ( 5.3  , 14.8 )
@@ -196,7 +197,7 @@ function name_a_friend(chance=0.25) {
         applied = "APPLIED";
     } else {
         name = "W'arrior O'light";
-        world = rworld;
+        world = hworld;
         nickname = "Nickname";
         applied = "default";
     }
@@ -206,7 +207,7 @@ function name_a_friend(chance=0.25) {
     document.getElementById("input-new-nickname-name").placeholder = name;
     document.getElementById("input-new-nickname-world").placeholder = world;
     document.getElementById("input-new-nickname-nickname").placeholder = nickname;
-    const data = `[${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}] ${name} >The Ruby Sea ( 5.3  , 14.8 )`;
+    const data = `[${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}] ${name} \u27A2The Ruby Sea ( 5.3  , 14.8 )`;
     document.getElementById("input-new-map-string").placeholder = data;
 }
 
