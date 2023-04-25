@@ -256,8 +256,8 @@ async function resetTabs(data_url) {
                 //console.log(`${map_img_relpath} | ${map_img_url}`);
                 const map_img = document.createElement("img");
                 map_img.setAttribute(   "id", map_img_id);
-                map_img.setAttribute("class", "img-fluid mh-100 mw-100");
-                map_img.setAttribute("style", "position: absolute;");
+                map_img.setAttribute("class", "img-fluid h-100 w-100");
+                map_img.setAttribute("style", "position: absolute; object-fit: contain; object-position: top left;");
                 map_img.setAttribute(  "src", map_img_url);
                 map_img.addEventListener("load", img_resize_svg)
 
