@@ -7,8 +7,8 @@ let settings = new Map([
     ["flag_margin_overflow", false],
 ]);
 let settings_debug = new Map();
-const map_pin_re_strict = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+) \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
-const map_pin_re_loose = new RegExp(/(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+) \( (\d+\.\d+) +, (\d+\.\d+) \)/u);
+const map_pin_re_strict = new RegExp(/^(?:\[\d\d?:\d\d\])?(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+).? \( (\d+\.\d+)  , (\d+\.\d+) \)/u);
+const map_pin_re_loose = new RegExp(/(?:\[[\w\d]+\])?[\(<]\W?\W?([\w'\- ]+)[\)>].+\ue0bb([\w'\- ]+).? \( (\d+\.\d+) +, (\d+\.\d+) \)/u);
 let user_settings = new Map();
 const session_cache = new Object_Cache(sessionStorage, "session_cache");
 let map_index;
