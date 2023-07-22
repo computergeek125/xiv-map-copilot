@@ -64,10 +64,12 @@ jobs:
           SSH_KEY:  ${{ secrets.STAGING_SSH_KEY }}
           SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
           SSH_HKEY: ${{ secrets.STAGING_SSH_HOSTKEY }}
-      - name: Download website
-        uses: actions/download-artifact@v3
-        with:
-          name: pages-archive.tar
+      - name: Debug OS
+        run: cat /etc/os-release
+      #- name: Download website
+      #  uses: actions/download-artifact@v3
+      #  with:
+      #    name: pages-archive.tar
       - name: Debug ls
         run: |
           echo "Contents of `pwd`:"
