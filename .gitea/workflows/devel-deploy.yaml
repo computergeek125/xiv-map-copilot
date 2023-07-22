@@ -77,5 +77,7 @@ jobs:
       - name: Extract website
         run: tar -xvf pages-archive.tar/artifact.tar
       - name: Deploy to server via rsync
-        run: rsync -avz --delete pages-archive/ ${{ STAGING_SSH_USER }}@${{ STAGING_SSH_HOST}}:${{ STAGING_WEB_FILEPATH }}
+        run: rsync -avz --delete --exclude=settings.js pages-archive/ ${{ STAGING_SSH_USER }}@${{ STAGING_SSH_HOST}}:${{ STAGING_WEB_FILEPATH }}
+      - name: eepy debug
+        run: sleep 300
 
