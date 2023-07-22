@@ -15,6 +15,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Jekyll Compile
         uses: actions/jekyll-build-pages@v1
+      - name: Debug pwd
+        run: pwd
+      - name: Debug ls
+        run: ls
       - name: Archive artifact
         shell: sh
         run: |
