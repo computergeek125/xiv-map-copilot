@@ -49,6 +49,7 @@ jobs:
     needs: build
     steps:
       - name: Install rsync (WHYYY)
+        run: apt install -y rsync
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
