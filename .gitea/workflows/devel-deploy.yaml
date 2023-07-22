@@ -1,0 +1,15 @@
+name: Test Server Build/Deploy
+run-name: Test Server deployment by ${{ gitea.actor }}
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Jekyll Compile
+        uses: actions/jekyll-build-pages@v1
