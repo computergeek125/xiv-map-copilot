@@ -68,7 +68,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: pages-archive.tar
-          path: artifacts
       - name: Debug ls
         run: |
           echo "Contents of `pwd`:"
@@ -76,7 +75,7 @@ jobs:
           echo "Contents of $RUNNER_TEMP:"
           ls -al $RUNNER_TEMP
       - name: Extract website
-        run: tar -xf artifact/artifact.tar
+        run: tar -xf pages-archive.tar/artifact.tar
       - name: Deploy to server via rsync
         run: rsync -avz pages-archive/ ${{ STAGING_WEB_FILEPATH }}
 
