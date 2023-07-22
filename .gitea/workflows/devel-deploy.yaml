@@ -75,7 +75,7 @@ jobs:
           echo "Contents of $RUNNER_TEMP:"
           ls -al $RUNNER_TEMP
       - name: Extract website
-        run: tar -xf pages-archive.tar/artifact.tar
+        run: tar -xvf pages-archive.tar/artifact.tar
       - name: Deploy to server via rsync
-        run: rsync -avz pages-archive/ ${{ STAGING_WEB_FILEPATH }}
+        run: rsync -avz --delete pages-archive/ ${{ STAGING_SSH_USER }}@${{ STAGING_SSH_HOST}}:${{ STAGING_WEB_FILEPATH }}
 
