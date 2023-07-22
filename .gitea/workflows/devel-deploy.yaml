@@ -48,6 +48,7 @@ jobs:
     environment: staging
     needs: build
     steps:
+      - name: Install rsync (WHYYY)
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
@@ -66,10 +67,10 @@ jobs:
           SSH_HKEY: ${{ secrets.STAGING_SSH_HOSTKEY }}
       - name: Debug OS
         run: cat /etc/os-release
-      #- name: Download website
-      #  uses: actions/download-artifact@v3
-      #  with:
-      #    name: pages-archive.tar
+      - name: Download website
+        uses: actions/download-artifact@v3
+        with:
+          name: pages-archive.tar
       - name: Debug ls
         run: |
           echo "Contents of `pwd`:"
