@@ -71,7 +71,7 @@ jobs:
       - name: Debug ls
         run: |
           echo "Contents of `pwd`:"
-          ls -al
+          ls -alR
           echo "Contents of $RUNNER_TEMP:"
           ls -al $RUNNER_TEMP
       - name: Extract website
