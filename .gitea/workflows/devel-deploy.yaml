@@ -21,6 +21,8 @@ jobs:
         run: pwd
       - name: Debug ls
         run: ls
+      - name: eepy debug
+        run: sleep 300
       - name: Archive artifact
         shell: sh
         run: |
