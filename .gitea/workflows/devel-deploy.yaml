@@ -21,9 +21,7 @@ jobs:
       - name: Debug pwd
         run: pwd
       - name: Debug ls
-        run: ls
-      - name: eepy debug
-        run: sleep 300
+        run: ls -al
       - name: Archive artifact
         shell: sh
         run: |
@@ -33,7 +31,8 @@ jobs:
             -cvf "$RUNNER_TEMP/artifact.tar" \
             --exclude=.git \
             --exclude=.github \
-            --transform "s#^\./#pages-archive#"
+            --exclude=.gitea \
+            --transform "s#^\./#pages-archive#" \
             .
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -45,13 +44,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: staging
+    needs: build
     steps:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/staging.key
           chmod 600 ~/.ssh/staging.key
-          cat >>~.ssh/conf <<END
+          cat >>~/.ssh/conf <<END
             Hostname     $SSH_HOST
             User         $SSH_USER
             IdentifyFile ~/.ssh/staging.key
@@ -68,4 +68,6 @@ jobs:
           name: pages-archive.tar
       - name: Extract website
         run: tar -xf pages-archive.tar
+      - name: Deploy to server via rsync
+        run: rsync -avz pages-archive/ ${{ STAGING_WEB_FILEPATH }}
 
