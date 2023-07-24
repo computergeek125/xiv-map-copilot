@@ -56,13 +56,13 @@ jobs:
           echo "$SSH_KEY" > ~/.ssh/staging.key
           chmod 600 ~/.ssh/staging.key
           cat >>~/.ssh/conf <<END
+          Host $SSH_HOST
             Hostname     $SSH_HOST
             User         $SSH_USER
+            IdentifyFile ~/.ssh/staging.key
           END
           echo "$SSH_HKEY" >> ~/.ssh/known_hosts
-          eval `ssh-agent`
-          ssh-add ~/.ssh/staging.key
-          ssh-add -l
+          cat ~/.ssh/config
         env:
           SSH_USER: ${{ secrets.STAGING_SSH_USER }}
           SSH_KEY:  ${{ secrets.STAGING_SSH_KEY }}
@@ -85,8 +85,7 @@ jobs:
       - name: Deploy to server via rsync
         run: |
           echo Deploying ${STAGING_SSH_USER}@${STAGING_SSH_HOST}:${STAGING_WEB_FILEPATH}
-          ssh-add -l
-          rsync -avz --delete --exclude=settings.js pages-archive/ ${STAGING_SSH_USER}@${STAGING_SSH_HOST}:${STAGING_WEB_FILEPATH}
+          rsync -avz --delete --exclude=settings.js pages-archive/ ${STAGING_SSH_HOST}:${STAGING_WEB_FILEPATH}
         env:
           STAGING_SSH_USER: ${{ secrets.STAGING_SSH_USER }}
           STAGING_SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
