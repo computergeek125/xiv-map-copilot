@@ -55,7 +55,7 @@ jobs:
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/staging.key
           chmod 600 ~/.ssh/staging.key
-          cat >>~/.ssh/conf <<END
+          cat >>~/.ssh/config <<END
           Host $SSH_HOST
             Hostname     $SSH_HOST
             User         $SSH_USER
