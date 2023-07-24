@@ -59,7 +59,7 @@ jobs:
           Host $SSH_HOST
             Hostname     $SSH_HOST
             User         $SSH_USER
-            IdentifyFile ~/.ssh/staging.key
+            IdentityFile ~/.ssh/staging.key
           END
           echo "$SSH_HKEY" >> ~/.ssh/known_hosts
           cat ~/.ssh/config
