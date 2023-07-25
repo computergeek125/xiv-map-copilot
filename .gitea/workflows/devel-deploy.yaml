@@ -15,9 +15,9 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v3
       - name: Jekyll Compile
-        uses: actions/jekyll-build-pages@v1
-        with:
-          verbose: true
+        run: |
+          bundle
+          bundle exec jekyll build
       - name: Debug ls
         run: |
           echo "Contents of `pwd`:"
@@ -29,12 +29,12 @@ jobs:
         run: |
           tar \
             --dereference --hard-dereference \
-            --directory "./" \
+            --directory "./_site" \
             -cvf "$RUNNER_TEMP/artifact.tar" \
             --exclude=.git \
             --exclude=.github \
             --exclude=.gitea \
-            --transform "s#^\./#pages-archive/#" \
+            --transform "s#^_site/#pages-archive/#" \
             .
       - name: Upload artifact
         uses: actions/upload-artifact@v3
