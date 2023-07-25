@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
+      - name: Install Jekyll
+        run: |
+          gem install jekyll bundler
       - name: Jekyll Compile
         run: |
           bundle
