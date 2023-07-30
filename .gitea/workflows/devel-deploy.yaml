@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 # based on https://github.com/actions/upload-pages-artifact/blob/main/action.yml
 jobs:
@@ -51,6 +52,10 @@ jobs:
     environment: staging
     needs: build
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
       #- name: Install rsync (WHYYY)
       #  run: apt install -y rsync
       - name: Configure SSH
@@ -92,7 +97,7 @@ jobs:
         env:
           STAGING_SSH_USER: ${{ secrets.STAGING_SSH_USER }}
           STAGING_SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
-          STAGING_WEB_FILEPATH: ${{ secrets.STAGING_WEB_FILEPATH }}
+          STAGING_WEB_FILEPATH: "${{ github.event.repository.name }}:${{ steps.extract_branch.outputs.branch }}"
       #- name: eepy debug
       #  run: sleep 300
 
