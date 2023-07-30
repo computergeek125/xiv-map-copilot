@@ -37,7 +37,7 @@ jobs:
             --exclude=.git \
             --exclude=.github \
             --exclude=.gitea \
-            --transform "s#^\./#pages-archive/#" \
+            --transform "s#^\_site/#pages-archive/#" \
             .
       - name: Upload artifact
         uses: actions/upload-artifact@v3
