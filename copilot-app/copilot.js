@@ -15,7 +15,6 @@ let map_index;
 let xfc = new XIV_FlagClusterinator(map_index, settings, session_cache);
 let wp;
 const player_flag_list = new Map();
-start_clock("nav-clock-text");
 
 async function init(return_tab=null, return_map=null) {
     try {
@@ -71,6 +70,12 @@ async function init(return_tab=null, return_map=null) {
     }
     if (settings.get("data_url")) {
         await load_data(settings.get("data_url"));
+    }
+    if (settings.get("show_clock")) {
+        document.getElementById("nav-clock-container").removeAttribute("hidden");
+        start_clock("nav-clock-text");
+    } else {
+        document.getElementById("nav-clock-container").setAttribute("hidden", null);
     }
     if (settings.get("session_cache")) {
         try {
@@ -501,6 +506,7 @@ const settings_list = [
     ["bool", "setting-flag-margin-over", "flag_margin_overflow"],
     ["bool", "setting-show-all-maps",    "show_all_maps"],
     ["radio","setting-parser-flag-regex","flag_regex"],
+    ["bool", "setting-show-clock",       "show_clock"]
 ];
 const settings_radios = new Map(Object.entries(
 {

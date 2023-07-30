@@ -114,7 +114,9 @@ function generate_time_text(id) {
 
 function start_clock(id) {
     generate_time_text(id);
-    setTimeout(start_clock, 25, id);
+    if (settings.get("show_clock")) {
+        setTimeout(start_clock, 25, id);
+    }
 }
 
 const frens = [
