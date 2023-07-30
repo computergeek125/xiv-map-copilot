@@ -90,6 +90,33 @@ function set_active(tab, map) {
     }
 }
 
+// from https://stackoverflow.com/a/2998874/1778122
+const zeroPad = (num, places) => String(num).padStart(places, '0')
+
+const EORZEA_MULTIPLIER = 3600/175
+function earth_to_eorzean_time(time) {
+    et_ms = time*EORZEA_MULTIPLIER;
+    return new Date(et_ms);
+}
+
+function generate_time_text(id) {
+    now = new Date();
+    et = earth_to_eorzean_time(now);
+    time_string_local = `${zeroPad(now.getHours(), 2)}:${zeroPad(now.getMinutes(), 2)}:${zeroPad(now.getSeconds(), 2)}`;
+    time_string_et    = `${zeroPad(et.getUTCHours(), 2)}:${zeroPad(et.getUTCMinutes(), 2)}:${zeroPad(et.getUTCSeconds(), 2)}`;
+    time_string       = `${time_string_local} LT / ${time_string_et} ET`;
+    time_elem = document.getElementById(id);
+    if (time_elem) {
+        //console.log(id, time_elem, time_string);
+        time_elem.innerText = time_string;
+    }
+}
+
+function start_clock(id) {
+    generate_time_text(id);
+    setTimeout(start_clock, 25, id);
+}
+
 const frens = [
     "Alka Zolka",
     "Alianne Vellegrance",
