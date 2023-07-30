@@ -265,7 +265,10 @@ async function resetTabs(data_url) {
                 map_img.setAttribute("class", "img-fluid h-100 w-100");
                 map_img.setAttribute("style", "position: absolute; object-fit: contain; object-position: top left;");
                 map_img.setAttribute(  "src", map_img_url);
-                map_img.addEventListener("load", img_resize_svg)
+                if (!settings.get("disable_lazy_load")) {
+                    map_img.setAttribute("loading", "lazy");
+                }
+                map_img.addEventListener("load", img_resize_svg);
 
                 const map_svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 map_svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
@@ -506,7 +509,8 @@ const settings_list = [
     ["bool", "setting-flag-margin-over", "flag_margin_overflow"],
     ["bool", "setting-show-all-maps",    "show_all_maps"],
     ["radio","setting-parser-flag-regex","flag_regex"],
-    ["bool", "setting-show-clock",       "show_clock"]
+    ["bool", "setting-show-clock",       "show_clock"],
+    ["bool", "setting-disable-lazy-load","disable_lazy_load"],
 ];
 const settings_radios = new Map(Object.entries(
 {
