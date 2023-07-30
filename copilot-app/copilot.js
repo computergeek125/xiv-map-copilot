@@ -15,6 +15,7 @@ let map_index;
 let xfc = new XIV_FlagClusterinator(map_index, settings, session_cache);
 let wp;
 const player_flag_list = new Map();
+start_clock("nav-clock-text");
 
 async function init(return_tab=null, return_map=null) {
     try {
@@ -188,7 +189,7 @@ async function resetTabs(data_url) {
         const e_name = sanitizeHTML(map_index['expansions'][e]['name']);
         const e_button = document.createElement('button');
         e_button.setAttribute(            "id", e_button_id);
-        e_button.setAttribute(         "class", "nav-link");
+        e_button.setAttribute(         "class", "nav-link w-100");
         e_button.setAttribute("data-bs-toggle", "pill");
         e_button.setAttribute("data-bs-target", `#${e_content_id}`);
         e_button.setAttribute(          "type", "button");
