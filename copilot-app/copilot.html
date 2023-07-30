@@ -138,6 +138,12 @@
                 <br />
                 <small id="setting-session-cache-help" class="form-text text-muted">Enabling this option will cache data you enter (such as map flags) to the session storage in your browser.  This preserves any data you enter against accidental refreshes.  Your browser will automatically clear this data at the end of your web session.  If this is disabled, any page refreshes will clear the aforementioned data.</small>
               </div>
+              <div class="form-group p-2">
+                <input type="checkbox" class="form-check-input" id="setting-show-clock">
+                <label class="form-check-label" for="setting-show-clock" aria-describedby="setting-show-clock-help">Show clock</label>
+                <br />
+                <small id="setting-show-clock-help" class="form-text text-muted">Enabling this option will show a local time and Eorza Time clock in the top left corner</small>
+              </div>
               <div class="form-group p-2 me-auto">
                 <button class="btn btn-primary" onclick="apply_settings()">Apply</button>
                 <button class="btn btn-secondary" onclick="persist_settings()">Persist</button>
