@@ -234,10 +234,12 @@ function name_a_friend(chance=0.25) {
         console.log(applied, rname);
     }
     document.getElementById("input-new-nickname-name").placeholder = name;
+    document.getElementById("input-new-map-char-name").placeholder = name;
     document.getElementById("input-new-nickname-world").placeholder = world;
+    document.getElementById("input-new-map-world").placeholder = world;
     document.getElementById("input-new-nickname-nickname").placeholder = nickname;
-    const data = `[${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}] ${name} \u27A2The Ruby Sea ( 5.3  , 14.8 )`;
-    document.getElementById("input-new-map-string").placeholder = data;
+    //const data = `[${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}] ${name} \u27A2The Ruby Sea ( 5.3  , 14.8 )`;
+    //document.getElementById("input-new-map-string").placeholder = data;
 }
 
 class Object_Cache {

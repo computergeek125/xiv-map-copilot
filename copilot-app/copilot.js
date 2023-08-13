@@ -333,11 +333,11 @@ function map_flag_display() {
     }
 }
 
-function _map_add_flag(map_string) {
+function _map_add_flag(map_input) {
     const map_selector = document.getElementById("map-list-selectable");
-    if (map_string) {
+    if (map_input) {
         try {
-            new_flag = xfc.add_map_flag(map_string);
+            new_flag = xfc.add_map_flag(map_input);
             if (new_flag) {
                 new_flag_opt = document.createElement("option");
                 new_flag_opt.text = new_flag.toString();
@@ -368,10 +368,26 @@ function _map_remove_flag(map_string) {
 }
 
 function map_add_flag() {
-    const input_map_element = document.getElementById("input-new-map-string");
-    const map_string = input_map_element.value;
-    _map_add_flag(map_string);
-    input_map_element.value = "";
+    //const input_map_element = document.getElementById("input-new-map-string");
+    //const map_string = input_map_element.value;
+    const input_map_char_name = document.getElementById("input-new-map-char-name");
+    const input_map_world = document.getElementById("input-new-map-world");
+    const input_map_zone = document.getElementById("input-new-map-zone");
+    const input_map_xcoord = document.getElementById("input-new-map-xcoord");
+    const input_map_ycoord = document.getElementById("input-new-map-ycoord");
+    char_name = wp.name_split(input_map_char_name.value);
+    map_input = new Map([
+        ["char_name", [char_name[0], char_name[1], input_map_world.value]],
+        ["map_name", input_map_zone.value],
+        ["coords", [input_map_xcoord.value, input_map_ycoord.value]],
+    ])
+    _map_add_flag(map_input);
+    //input_map_element.value = "";
+    input_map_char_name.value = "";
+    input_map_world.value = "";
+    input_map_zone.value = "";
+    input_map_xcoord.value = "";
+    input_map_ycoord.value = "";
 }
 
 function map_bulk_import() {
