@@ -30,7 +30,7 @@
             <button class="nav-link w-100" id="expac-tabs-sb-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-sb-content" type="button" role="tab" aria-controls="expac-tabs-sb-content" aria-selected="false">Stormblood</button>
             <button class="nav-link w-100" id="expac-tabs-shb-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-shb-content" type="button" role="tab" aria-controls="expac-tabs-shb-content" aria-selected="false">Shadowbringers</button>
             <button class="nav-link w-100" id="expac-tabs-ew-button" data-bs-toggle="pill" data-bs-target="#expac-tabs-ew-content" type="button" role="tab" aria-controls="expac-tabs-ew-content" aria-selected="false">Endwalker</button>
-            <button class="nav-link w-100" id="setting-tabs-maps-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-maps-content" type="button" role="tab" aria-controls="setting-tabs-maps-content" aria-selected="false" onclick="name_a_friend();focus_click(event,'input-new-map-string');">Map List</button>
+            <button class="nav-link w-100" id="setting-tabs-maps-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-maps-content" type="button" role="tab" aria-controls="setting-tabs-maps-content" aria-selected="false" onclick="name_a_friend();focus_click(event,'input-new-map-char-name');">Map List</button>
             <button class="nav-link w-100" id="setting-tabs-nicknames-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-nicknames-content" type="button" role="tab" aria-controls="setting-tabs-nicknames-content" aria-selected="false" onclick="name_a_friend();focus_click(event, 'input-new-nickname-name');">Nicknames</button>
             <button class="nav-link w-100" id="setting-tabs-settings-button" data-bs-toggle="pill" data-bs-target="#setting-tabs-settings-content" type="button" role="tab" aria-controls="setting-tabs-settings-content" aria-selected="false" onclick="update_settings_page();">Settings</button>
           </div>
@@ -43,11 +43,36 @@
           <div class="tab-pane fade" id="expac-tabs-ew-content" role="tabpanel" aria-labelledby="expac-tabs-ew-button">Endwalker Placeholder Data</div>
           <div class="tab-pane fade" id="setting-tabs-maps-content" role="tabpanel" aria-labelledby="setting-tabs-maps-button">
             <div class="d-flex flex-column">
-              <div class="input-group p-2">
-                <div class="input-group-prepend">
-                  <button class="btn btn-outline-success" type="button" onclick="map_add_flag()">Add map</button>
+              <div class="form-group p-2 row g-0">
+                <div class="col-md-4">
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="input-new-map-char-name" onkeyup="focus_enter(event, 'input-new-map-world');" placeholder="Warrior Oflight">
+                  </div>
                 </div>
-                <input type="text" class="form-control" id="input-new-map-string" onkeyup="map_keyup(event);">
+                <div class="col-md-2">
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="input-new-map-world" onkeyup="focus_enter(event, 'input-new-map-zone');" placeholder="Diabolos">
+                  </div>
+                </div>
+                <div class="col-md-2 gx-2">
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="input-new-map-zone" onkeyup="focus_enter(event, 'input-new-map-xcoord');" placeholder="The Ruby Sea">
+                  </div>
+                </div>
+                <div class="col-md-3 gx-2">
+                  <div class="input-group">
+                    <div class="input-group-text">(</div>
+                    <input type="number" step=0.1 class="form-control" id="input-new-map-xcoord" onkeyup="focus_enter(event, 'input-new-map-ycoord');" placeholder="5.3">
+                    <div class="input-group-text">,</div>
+                    <input type="number" step=0.1 class="form-control" id="input-new-map-ycoord" onkeyup="map_keyup(event);" placeholder="14.8">
+                    <div class="input-group-text">)</div>
+                  </div>
+                </div>
+                <div class="col-md-1">
+                  <div class="input-group">
+                    <button class="btn btn-outline-success" type="button" onclick="map_add_flag()">Add map</button>
+                  </div>
+                </div>
               </div>
               <div class="form-group p-2">
                 <label for="map-list-selectable">Current map list:</label>
