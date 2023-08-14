@@ -368,8 +368,6 @@ function _map_remove_flag(map_string) {
 }
 
 function map_add_flag() {
-    //const input_map_element = document.getElementById("input-new-map-string");
-    //const map_string = input_map_element.value;
     const input_map_char_name = document.getElementById("input-new-map-char-name");
     const input_map_world = document.getElementById("input-new-map-world");
     const input_map_zone = document.getElementById("input-new-map-zone");
@@ -382,7 +380,6 @@ function map_add_flag() {
         ["coords", [input_map_xcoord.value, input_map_ycoord.value]],
     ])
     _map_add_flag(map_input);
-    //input_map_element.value = "";
     input_map_char_name.value = "";
     input_map_world.value = "";
     input_map_zone.value = "";
@@ -427,6 +424,25 @@ function map_select_move_down() {
         xfc.switch_map_positions(idx, idx+1);
         map_flag_display();
         map_selector.selectedIndex = idx+1;
+    }
+}
+
+function map_select_edit() {
+    const map_selector = document.getElementById("map-list-selectable");
+    const input_map_char_name = document.getElementById("input-new-map-char-name");
+    const input_map_world = document.getElementById("input-new-map-world");
+    const input_map_zone = document.getElementById("input-new-map-zone");
+    const input_map_xcoord = document.getElementById("input-new-map-xcoord");
+    const input_map_ycoord = document.getElementById("input-new-map-ycoord");
+    if (map_selector.selectedOptions.length > 0) {
+        flag = xfc.flags.get(map_selector.selectedOptions[0].value);
+        input_map_char_name.value = `${flag.char_name[0]} ${flag.char_name[1]}`;
+        input_map_world.value = flag.char_name[2];
+        input_map_zone.value = flag.map_name;
+        input_map_xcoord.value = flag.coords[0];
+        input_map_ycoord.value = flag.coords[1];
+        _map_remove_flag(map_selector.selectedOptions[0].value);
+        map_flag_display();
     }
 }
 
