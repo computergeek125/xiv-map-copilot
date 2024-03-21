@@ -27,7 +27,7 @@ class XIV_WorldParser {
     }
 
     parse_charname(char_name) {
-        const first_last = this.name_split(char_name);
+        const first_last = this.name_split(char_name.replaceAll(/\s{2,}/g, " ").trim());
         let sn_idx = null;
         for (const i in first_last[1]) {
             if (first_last[1][i].toUpperCase() == first_last[1][i]) {
@@ -83,9 +83,14 @@ class XIV_MapFlag {
     }
 
     static from_dict(map_dict, maps, reverse_lookup, nicknames, settings) {
+        const char_name = map_dict.get("char_name");
+        for (let c=0; c<char_name.length; c++) {
+            char_name[c] = char_name[c].replaceAll(/\s{2,}/g, " ").trim();
+        }
+        const map_name = map_dict.get("map_name").replaceAll(/\s{2,}/g, " ").trim()
         return new XIV_MapFlag(
-            map_dict.get("char_name"),
-            map_dict.get("map_name"),
+            char_name,
+            map_name,
             map_dict.get("coords"),
             maps,
             reverse_lookup,
