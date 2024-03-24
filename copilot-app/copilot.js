@@ -344,11 +344,11 @@ function _map_add_flag(map_input) {
                 map_selector.add(new_flag_opt);
                 console.log(`Added flag ${new_flag}`);
             } else {
-                console.log(`Failed to add flag for ${map_string}`);
+                console.log(`Failed to add flag for ${map_input}`);
             }
         } catch (e) {
             if (e instanceof XIV_ParseError) {
-                console.error(`Failed to parse ${map_string} with error ${e}`);
+                console.error(`Failed to parse ${map_input} with error ${e}`);
             } else {
                 throw e;
             }
