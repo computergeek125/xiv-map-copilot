@@ -90,7 +90,9 @@ async function init(return_tab=null, return_map=null) {
         map_selector.innerHTML = "";
         for (const new_flag of xfc.flags.values()) {
             const new_flag_opt = document.createElement("option");
-            new_flag_opt.text = new_flag.toString();
+            map_flag_string = new_flag.toString();
+            new_flag_opt.text = map_flag_string;
+            new_flag_opt.value = map_flag_string;
             map_selector.add(new_flag_opt);
             console.log(`Regenerated flag ${new_flag}`);
         }
@@ -311,13 +313,13 @@ function focus_click(e, target) {
 }
 
 function focus_enter(e, target) {
-    if (e.which == 13) {
+    if (e.key == "Enter") {
         document.getElementById(target).focus();
     }
 }
 
 function map_keyup(e) {
-    if (e.which == 13) {
+    if (e.key == "Enter") {
         map_add_flag();
     }
 }
@@ -329,18 +331,21 @@ function map_flag_display() {
     for (const i of index) {
         const map_opt = document.createElement("option");
         map_opt.text = `${i}`;
+        map_opt.value = `${i}`;
         map_selector.add(map_opt);
     }
 }
 
-function _map_add_flag(map_input) {
+function _map_add_flag(map_input, suppress_blank=false) {
     const map_selector = document.getElementById("map-list-selectable");
     if (map_input) {
         try {
             new_flag = xfc.add_map_flag(map_input);
             if (new_flag) {
                 new_flag_opt = document.createElement("option");
-                new_flag_opt.text = new_flag.toString();
+                new_flag_string = new_flag.toString();
+                new_flag_opt.text = new_flag_string;
+                new_flag_opt.value = new_flag_string;
                 map_selector.add(new_flag_opt);
                 console.log(`Added flag ${new_flag}`);
             } else {
@@ -354,7 +359,9 @@ function _map_add_flag(map_input) {
             }
         }
     } else {
-        console.log("Refusing to parse empty string");
+        if (!suppress_blank) {
+            console.log("Refusing to parse empty string");
+        }
     }
 }
 
@@ -374,8 +381,15 @@ function map_add_flag() {
     const input_map_xcoord = document.getElementById("input-new-map-xcoord");
     const input_map_ycoord = document.getElementById("input-new-map-ycoord");
     char_name = wp.name_split(input_map_char_name.value);
+    let char_world
+    if (input_map_world == "") {
+        char_world = input_map_world;
+    } else {
+        char_world = settings.get("home_world");
+    }
+    console.log("found", char_name, char_world, input_map_world)
     map_input = new Map([
-        ["char_name", [char_name[0], char_name[1], input_map_world.value]],
+        ["char_name", [char_name[0], char_name[1], char_world]],
         ["map_name", input_map_zone.value],
         ["coords", [input_map_xcoord.value, input_map_ycoord.value]],
     ])
@@ -387,11 +401,28 @@ function map_add_flag() {
     input_map_ycoord.value = "";
 }
 
+function map_bulk_keyup(e) {
+    // based on https://stackoverflow.com/a/68900296/1778122
+    if (e.key == "Enter") { // Enter pressed
+        let modifier;
+        if (e.shiftKey || e.altKey || e.ctrlKey) {
+            modifier = true;
+        } else {
+            modifier = false;
+        }
+        if (modifier) {
+            return "Enter";
+        } else {
+            map_bulk_import();
+        }
+    }
+}
+
 function map_bulk_import() {
     const input_bulk_element = document.getElementById('input-new-map-bulk');
     const input_bulk_value = input_bulk_element.value.split("\n");
     for (const line of input_bulk_value) {
-        _map_add_flag(line);
+        _map_add_flag(line, suppress_blank=true);
     }
     input_bulk_element.value = "";
 }
@@ -449,7 +480,6 @@ function map_select_edit() {
 function map_remove_selected() {
     const map_selector = document.getElementById("map-list-selectable");
     for (const selected_map of map_selector.selectedOptions) {
-        console.log("Found selection", selected_map);
         _map_remove_flag(selected_map.value);
     }
     map_flag_display();
@@ -465,7 +495,7 @@ function map_clear_all() {
 }
 
 function nickname_keyup(e) {
-    if (e.which == 13) {
+    if (e.key == "Enter") {
         nickname_add();
     }
 }
@@ -476,7 +506,8 @@ function nickname_display() {
     const index = xfc.nicknames.sorted_by_char_name();
     for (const i of index) {
         const new_nickname_opt = document.createElement("option");
-        new_nickname_opt.text = `${i} --> ${xfc.nicknames.get_nickname(i)}`;
+        let value = `${i} --> ${xfc.nicknames.get_nickname(i)}`;
+        new_nickname_opt.text = value;
         new_nickname_opt.setAttribute("nickname_hash", i);
         nickname_selector.add(new_nickname_opt);
     }
@@ -487,7 +518,12 @@ function nickname_add() {
     const input_world_element = document.getElementById("input-new-nickname-world");
     const input_nickname_element = document.getElementById("input-new-nickname-nickname");
     const char_string = input_name_element.value;
-    const world_name = input_world_element.value;
+    let world_name;
+    if (input_world_element.value == "") {
+        world_name = settings.get("home_world");
+    } else {
+        world_name = input_world_element.value;
+    }
     const nickname_name = input_nickname_element.value;
     const char_name = xfc.set_nickname(char_string, world_name, nickname_name);
     if (char_name) {
@@ -524,7 +560,7 @@ function nickname_remove_selected() {
 function nickname_clear_all() {
     const nickname_selector = document.getElementById("nickname-list-selectable");
     for (let i=nickname_selector.options.length-1; i>=0; i--) {
-        const selected_nickname = nickname_selector.options[i].value;
+        const selected_nickname = nickname_selector.options[i].getAttribute("nickname_hash");
         xfc.remove_nickname(selected_nickname);
     }
     nickname_display();
