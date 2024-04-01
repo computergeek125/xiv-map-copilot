@@ -266,10 +266,13 @@ async function resetTabs(data_url) {
                 map_img.setAttribute(   "id", map_img_id);
                 map_img.setAttribute("class", "img-fluid h-100 w-100");
                 map_img.setAttribute("style", "position: absolute; object-fit: contain; object-position: top left;");
-                map_img.setAttribute(  "src", map_img_url);
                 if (!settings.get("disable_lazy_load")) {
+                    // This has to come before `src` to work around a firefox bug
+                    // https://stackoverflow.com/a/76252772
+                    console.log("Lazy Loading:", !settings.get("disable_lazy_load"))
                     map_img.setAttribute("loading", "lazy");
                 }
+                map_img.setAttribute(  "src", map_img_url);
                 map_img.addEventListener("load", img_resize_svg);
 
                 const map_svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -280,6 +283,7 @@ async function resetTabs(data_url) {
                 map_svg.setAttribute("viewBox", `0 0 1177 1177`);
                 xma.svg = map_svg;
 
+                console.log(map_img);
                 map_content.appendChild(map_img);
                 map_content.appendChild(map_svg);
                 e_tabstrip.appendChild(map_tab_li);
@@ -382,12 +386,11 @@ function map_add_flag() {
     const input_map_ycoord = document.getElementById("input-new-map-ycoord");
     char_name = wp.name_split(input_map_char_name.value);
     let char_world
-    if (input_map_world == "") {
-        char_world = input_map_world;
-    } else {
+    if (input_map_world.value == "") {
         char_world = settings.get("home_world");
+    } else {
+        char_world = input_map_world.value;
     }
-    console.log("found", char_name, char_world, input_map_world)
     map_input = new Map([
         ["char_name", [char_name[0], char_name[1], char_world]],
         ["map_name", input_map_zone.value],
