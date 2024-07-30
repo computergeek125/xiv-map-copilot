@@ -404,7 +404,7 @@ function map_add_flag() {
     input_map_ycoord.value = "";
 }
 
-function map_bulk_keyup(e) {
+function map_bulk_keydown(e) {
     // based on https://stackoverflow.com/a/68900296/1778122
     if (e.key == "Enter") { // Enter pressed
         let modifier;
@@ -416,6 +416,8 @@ function map_bulk_keyup(e) {
         if (modifier) {
             return "Enter";
         } else {
+            e.preventDefault()
+            e.stopPropagation()
             map_bulk_import();
         }
     }
